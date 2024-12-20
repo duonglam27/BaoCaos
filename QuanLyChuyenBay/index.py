@@ -344,7 +344,7 @@ def pay_now(sove, chuyen_bay_id):
     if dao.save_ticket_now(sove, chuyen_bay_id):
         pass
     else:
-        return render_template("test.html", ero='cccc')
+        return render_template("test.html", ero='Thanh toán không thành công')
     total = str(int(float(money)))
     # return jsonify({'status': 200})
     return redirect("/")

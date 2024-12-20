@@ -127,7 +127,7 @@ def save_ticket_now(sove, id_chuyen_bay):
     address = []
     phone = []
     email = []
-    CMND = []
+    CCCD = []
 
     for i in range(sove):
         hangve.append(request.form.get('hangve' + str(i)))
@@ -136,10 +136,10 @@ def save_ticket_now(sove, id_chuyen_bay):
         phone.append(request.form.get('phone_num' + str(i)))
         address.append(request.form.get('address' + str(i)))
         email.append(request.form.get('email' + str(i)))
-        CMND.append(request.form.get('CMND' + str(i)))
+        CCCD.append(request.form.get('CCCD' + str(i)))
 
     for i in range(sove):
-        cus = Customer(name=name[i], sex=sex[i], phone=phone[i], address=address[i], email=email[i], CMND=CMND[i])
+        cus = Customer(name=name[i], sex=sex[i], phone=phone[i], address=address[i], email=email[i], CCCD=CCCD[i])
         db.session.add(cus)
         t = Ticket(userid=current_user, hang_ve=hangve[i], customerid=cus, so_ghe=i)
         db.session.add(t)
@@ -166,7 +166,7 @@ def save_ticket(cart, sove):
     address = []
     phone = []
     email = []
-    CMND = []
+    CCCD = []
 
     for i in range(sove):
         hangve.append(request.form.get('hangve' + str(i)))
@@ -175,13 +175,13 @@ def save_ticket(cart, sove):
         phone.append(request.form.get('phone_num' + str(i)))
         address.append(request.form.get('address' + str(i)))
         email.append(request.form.get('email' + str(i)))
-        CMND.append(request.form.get('CMND' + str(i)))
+        CCCD.append(request.form.get('CCCD' + str(i)))
 
     try:
         for i, c in enumerate(cart.values()):
             for _ in range(c['quantity']):
                 cus = Customer(name=name[i], sex=sex[i], phone=phone[i], address=address[i], email=email[i],
-                               CMND=CMND[i])
+                               CMND=CCCD[i])
                 db.session.add(cus)
                 t = Ticket(userid=current_user, hang_ve=hangve[i], customerid=cus, so_ghe=i)
                 db.session.add(t)

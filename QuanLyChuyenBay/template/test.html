@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Báo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .error-message {
+            color: #ff4d4d;
+            font-weight: bold;
+        }
+        .success-message {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Kết quả thanh toán</h2>
+        {% if ero %}
+            <div class="error-message">
+                <p>{{ ero }}</p>
+            </div>
+        {% else %}
+            <div class="success-message">
+                <p>Thanh toán thành công!</p>
+            </div>
+        {% endif %}
+        <a href="/" class="btn">Trở về trang chủ</a>
+    </div>
+</body>
+</html>

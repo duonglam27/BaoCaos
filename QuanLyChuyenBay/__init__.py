@@ -3,6 +3,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from urllib.parse import quote
+import oauthlib
+from oauthlib.common import CLIENT_ID_CHARACTER_SET
 
 # from flask_babelex import Babel
 
@@ -12,6 +14,7 @@ app.secret_key = "!@#$%^&*()"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/maybaydb?charset=utf8mb4' % quote('lam27072004Aa')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['CART_KEY'] = 'cart'
+
 cloudinary.config(cloud_name='dtkzgdef1',
                   api_key='159519239888648',
                   api_secret='DZWRFYAgl22pGGAqsQhxjo-0H30')

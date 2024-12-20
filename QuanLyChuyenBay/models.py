@@ -155,7 +155,7 @@ class Customer(BaseModel):
     phone = Column(String(11), nullable=False)
     address = Column(String(50), nullable=False)
     email = Column(String(50), nullable=True)
-    CMND = Column(String(12), nullable=False)
+    CCCD = Column(String(12), nullable=False)
     ticket_id = relationship('Ticket', backref='customerid', lazy=True)
 
     def __str__(self):
@@ -220,14 +220,14 @@ if __name__ == '__main__':
         db.session.add(lcb1)
         db.session.commit()
 
-        lcb1 = LichChuyenBay(chuyen_bay_id=1, may_bay_id=1, ngay_gio=datetime(2024, 12, 16, 14, 0),
-                             thoi_gian_bay=2.5, so_luong_hang_ve_1=150, so_luong_hang_ve_2=100, price=1000)
+        lcb1 = LichChuyenBay(chuyen_bay_id=1, may_bay_id=1, ngay_gio=datetime(2024, 12, 20, 15, 0),
+                             thoi_gian_bay=2.5, so_luong_hang_ve_1=1, so_luong_hang_ve_2=0, price=1000)
         db.session.add(lcb1)
         db.session.commit()
 
         # Thêm dữ liệu mẫu cho Customer (Khách hàng)
         customer1 = Customer(name="KieuMy", sex='Nu', phone="0123456789",
-                             address="30/04 Giai Phong, HCM", email="abc@gmail.com", CMND="11223344")
+                             address="30/04 Giai Phong, HCM", email="abc@gmail.com", CCCD="11223344")
         db.session.add(customer1)
         db.session.commit()
 
