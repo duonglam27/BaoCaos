@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark" style="position: relative;">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark header-bg">
     <div class="container-fluid">
 
         <a class="navbar-brand" href="/">
@@ -67,7 +67,7 @@
                 {% if current_user.isAdmin() or current_user.isStaff()%}
                 <li class="nav-item">
                     <h5>
-                        <a class="nav-link text-secondary" href="{{ url_for('AddFlightSchedule') }}">
+                        <a class="nav-link" href="{{ url_for('AddFlightSchedule') }}">
                             Lập lịch
                         </a>
                     </h5>
@@ -77,7 +77,7 @@
                 {% if current_user.isAdmin() %}
                 <li class="nav-item">
                     <h5>
-                        <a class="nav-link text-secondary" href="{{ url_for('RuleChange') }}">
+                        <a class="nav-link" href="{{ url_for('RuleChange') }}">
                             Quy định
                         </a>
                     </h5>
@@ -87,7 +87,7 @@
                 {% if current_user.isUser()%}
                 <li class="nav-item">
 
-                    <h5><a class="nav-link text-secondary" href="{{ url_for('cart') }}">&#128722; Giỏ hàng <span
+                    <h5><a class="nav-link" href="{{ url_for('cart') }}">&#128722; Giỏ hàng <span
                             class="badge bg-danger cart-counter">{{ cart.total_quantity }}</span></a></h5>
                 </li>
                 {%endif%}

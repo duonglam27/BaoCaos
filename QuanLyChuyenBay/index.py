@@ -16,14 +16,16 @@ import hashlib
 
 @app.route('/')
 def home():
+    san_bay = dao.load_san_bay()
     Tu = request.args.get("from")
     Den = request.args.get("to")
     Ngay = request.args.get("date")
     lich_chuyen_bay = dao.load_lich_may_bay(Tu, Den, Ngay)
     chuyen_bay = dao.load_chuyen_bay()
+
     now = datetime.now()
     ve = dao.load_ve()
-    return render_template('index.html', lich_chuyen_bay=lich_chuyen_bay, chuyen_bay=chuyen_bay, ve=ve, now=now)
+    return render_template('index.html', lich_chuyen_bay=lich_chuyen_bay, chuyen_bay=chuyen_bay, ve=ve, now=now, san_bay=san_bay)
 
 
 @app.route('/AddFlightSchedule', methods=['get', 'post'])
@@ -200,10 +202,16 @@ def details(lich_chuyen_bay_id):
 
 @app.route("/order")
 def order():
-    ten_dia_diem = dao.load_san_bay()
-    return render_template("order.html", ten_dia_diem=ten_dia_diem)
-
-
+    san_bay = dao.load_san_bay()
+    Tu = request.args.get("from")
+    Den = request.args.get("to")
+    Ngay = request.args.get("date")
+    lich_chuyen_bay = dao.load_lich_may_bay(Tu, Den, Ngay)
+    chuyen_bay = dao.load_chuyen_bay()
+    now = datetime.now()
+    ve = dao.load_ve()
+    return render_template('order.html', lich_chuyen_bay=lich_chuyen_bay, chuyen_bay=chuyen_bay, ve=ve, now=now,
+                           san_bay=san_bay)
 @app.route("/result")
 def result():
     Tu = request.args.get("from")
@@ -344,7 +352,7 @@ def pay_now(sove, chuyen_bay_id):
     if dao.save_ticket_now(sove, chuyen_bay_id):
         pass
     else:
-        return render_template("test.html", ero='Thanh toán không thành công')
+        return render_template("test.html", ero='Thanh toán không  thành công')
     total = str(int(float(money)))
     # return jsonify({'status': 200})
     return redirect("/")

@@ -1,29 +1,27 @@
 {% extends 'layout/base.html' %}
+
 {% block script %}
 <script>
-
-
     function deleteRow(rowid){
-        var btn = document.getElementById("btnAdd")
+        var btn = document.getElementById("btnAdd");
         var row = document.getElementById(rowid);
         row.parentNode.removeChild(row);
         var ordinal = document.getElementsByClassName("ordinal");
         var total = document.getElementById("so-san-bay-trung-gian");
         for (let i = 0; i < ordinal.length; i++)
                 ordinal[i].innerText = i+1;
-        total.value = ordinal.length
-        console.info(total)
-        if(ordinal.length <{{san_bay_trung_gian_toi_da}}){
+        total.value = ordinal.length;
+        console.info(total);
+        if(ordinal.length < {{san_bay_trung_gian_toi_da}}){
             btn.removeAttribute('disabled', '');
             btn.classList.add("btn-success");
         }
-
     }
 
     var index;
     $(document).ready(function(){
         $("#btnAdd").click(function(){
-             console.info(document.getElementById("sbtg").rows.length-1)
+             console.info(document.getElementById("sbtg").rows.length-1);
              var x = document.getElementById("sbtg").rows.length-1;
              window.index = x+1;
              var i;
@@ -38,18 +36,16 @@
             row += '</tr>';
              $('.add').append(row);
              var total = document.getElementById("so-san-bay-trung-gian");
-             total.value = index
+             total.value = index;
              if(x >= {{san_bay_trung_gian_toi_da}}-1){
                 this.setAttribute('disabled', '');
                 this.classList.remove("btn-success");
                 }
-
         });
     });
-
-
 </script>
-{%endblock%}
+{% endblock %}
+
 {% block content %}
 {% if ero_msg %}
 <div class="alert alert-danger">{{ero_msg}}</div>
@@ -112,6 +108,7 @@
             </td>
         </tr>
     </table>
+
     <table class="table" style="border: 1px solid; border-collapse: collapse;">
         <tr>
             <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Số lượng ghế hạng 1</th>
@@ -126,6 +123,7 @@
             </td>
         </tr>
     </table>
+
     <h4>Sân bay trung gian(tối đa {{san_bay_trung_gian_toi_da}})</h4>
     <table class="table add" id="sbtg" style="border: 1px solid; border-collapse: collapse;">
         <tr>
@@ -158,13 +156,14 @@
     <input type="number" value="1" class="form-control" id="so-san-bay-trung-gian"
            name="so_san_bay_tg" hidden>
     <br><br>
-    <p>Link hình chuyến bay</p>
-    <input type="file" class="form-control" id="avatar" name="image" required>
+
+    <p>Tên địa chỉ hình chuyến bay</p>
+    <input type="text" class="form-control" id="image-name" name="image" required placeholder="Nhập địa chỉ hình ảnh">
+
     <br><br><br>
     <div class="text-center">
         <button type="submit" class="btn btn-primary w-25 h-50"><h3>Xác nhận</h3></button>
     </div>
 </form>
-
 
 {% endblock %}

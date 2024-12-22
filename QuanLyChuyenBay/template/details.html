@@ -1,126 +1,133 @@
 {% extends 'layout/base.html' %}
 
-
 {% block content %}
-<h1 class="text-center text-success mt-2 mb-5">CHI TIẾT CHUYẾN BAY</h1>
+<div class="container mt-5">
 
-<div class="row">
-
-    <div class="col-12">
-        <!--        table1-->
-        <table class="table" style="border: 1px solid; border-collapse: collapse;">
-            <tr>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Tên chuyến bay</th>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Máy bay</th>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Ngày giờ bay</th>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Thời gian bay</th>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Sân bay đi</th>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Sân bay đến</th>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Giá tiền</th>
-            </tr>
-            <tr>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {% for cb in chuyen_bay %}
-                    {% if cb.id == lich_chuyen_bay.chuyen_bay_id %}
-                    {{ cb.ten_chuyen_bay }}
-                    {% endif %}
-                    {% endfor %}
-                </td>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {% for mb in may_bay %}
-                    {% if mb.id == lich_chuyen_bay.may_bay_id %}
-                    {{ mb.loai_may_bay }}
-                    {% endif %}
-                    {% endfor %}
-                </td>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {{ lich_chuyen_bay.ngay_gio }}
-                </td>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {{ lich_chuyen_bay.gio() }}
-                </td>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {% for cb in chuyen_bay %}
-                    {% if cb.id == lich_chuyen_bay.chuyen_bay_id %}
-                    {% for sb in san_bay %}
-                    {% if sb.id == cb.san_bay_di_id %}
-                    {{ sb.ten_san_bay }}
-                    {% endif %}
-                    {% endfor %}
-                    {% endif %}
-                    {% endfor %}
-                </td>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {% for cb in chuyen_bay %}
-                    {% if cb.id == lich_chuyen_bay.chuyen_bay_id %}
-                    {% for sb in san_bay %}
-                    {% if sb.id == cb.san_bay_den_id %}
-                    {{ sb.ten_san_bay }}
-                    {% endif %}
-                    {% endfor %}
-                    {% endif %}
-                    {% endfor %}
-                </td>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {{ "{:,.1f}".format(lich_chuyen_bay.price) }} VNĐ
-                </td>
-            </tr>
-        </table>
-        <!--        table 2-->
-        <table class="table" style="border: 1px solid; border-collapse: collapse;">
-            <tr>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Số lượng ghế hạng 1</th>
-                <th class="text-center" style="border: 1px solid; border-collapse: collapse;">Số lượng ghế hạng 2</th>
-            </tr>
-            <tr>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {{ lich_chuyen_bay.so_luong_hang_ve_1 }}
-                </td>
-                <td class="text-center" style="border: 1px solid; border-collapse: collapse;">
-                    {{ lich_chuyen_bay.so_luong_hang_ve_2 }}
-                </td>
-            </tr>
-        </table>
-        <!--        table3 -->
-        <table class="table text-center" style="border: 1px solid; border-collapse: collapse;">
-            <tr>
-                <th style="border: 1px solid; border-collapse: collapse;">
-                    STT
-                </th>
-                <th style="border: 1px solid; border-collapse: collapse;">
-                    Sân bay trung gian
-                </th>
-                <th style="border: 1px solid; border-collapse: collapse;">
-                    Thời gian dừng
-                </th>
-                <th style="border: 1px solid; border-collapse: collapse;">
-                    Ghi chú
-                </th>
-            </tr>
-
-            {% for sbtg in san_bay_trung_gian%}
-            <tr>
-                <td style="border: 1px solid; border-collapse: collapse;">
-                    1
-                </td>
-                {% for sanbay in san_bay %}
-                {% if sbtg.san_bay == sanbay.id %}
-                <td style="border: 1px solid; border-collapse: collapse;">
-                    {{ sanbay.ten_san_bay }}
-                </td>
-                {% endif %}
-                {% endfor %}
-
-                <td style="border: 1px solid; border-collapse: collapse;">
-                    {{dao.gio(sbtg.thoi_gian_dung)}}
-                </td>
-                <td style="border: 1px solid; border-collapse: collapse;">
-
-                </td>
-            </tr>
-            {% endfor %}
-
-        </table>
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4 font-weight-bold text-dark">CHI TIẾT CHUYẾN BAY</h1>
+        </div>
     </div>
+
+    <!-- Flight Info Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-light shadow-sm rounded-lg">
+                <div class="card-body">
+                    <h5 class="card-title font-weight-bold text-dark">Thông Tin Chuyến Bay</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li><strong>Tên Chuyến Bay:</strong>
+                            {% for cb in chuyen_bay %}
+                            {% if cb.id == lich_chuyen_bay.chuyen_bay_id %}
+                            {{ cb.ten_chuyen_bay }}
+                            {% endif %}
+                            {% endfor %}
+                        </li>
+                        <li><strong>Máy Bay:</strong>
+                            {% for mb in may_bay %}
+                            {% if mb.id == lich_chuyen_bay.may_bay_id %}
+                            {{ mb.loai_may_bay }}
+                            {% endif %}
+                            {% endfor %}
+                        </li>
+                        <li><strong>Ngày Giờ Bay:</strong> {{ lich_chuyen_bay.ngay_gio }}</li>
+                        <li><strong>Thời Gian Bay:</strong> {{ lich_chuyen_bay.gio() }} giờ</li>
+                        <li><strong>Sân Bay Đi:</strong>
+                            {% for cb in chuyen_bay %}
+                            {% if cb.id == lich_chuyen_bay.chuyen_bay_id %}
+                            {% for sb in san_bay %}
+                            {% if sb.id == cb.san_bay_di_id %}
+                            {{ sb.ten_san_bay }}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                            {% endfor %}
+                        </li>
+                        <li><strong>Sân Bay Đến:</strong>
+                            {% for cb in chuyen_bay %}
+                            {% if cb.id == lich_chuyen_bay.chuyen_bay_id %}
+                            {% for sb in san_bay %}
+                            {% if sb.id == cb.san_bay_den_id %}
+                            {{ sb.ten_san_bay }}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                            {% endfor %}
+                        </li>
+                        <li><strong>Giá Vé:</strong> {{ "{:,.1f}".format(lich_chuyen_bay.price) }} VNĐ</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seat Info Section -->
+        <div class="col-md-6">
+            <div class="card border-light shadow-sm rounded-lg">
+                <div class="card-body">
+                    <h5 class="card-title font-weight-bold text-dark">Thông Tin Ghế</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li><strong>Số Lượng Ghế Hạng 1:</strong> {{ lich_chuyen_bay.so_luong_hang_ve_1 }}</li>
+                        <li><strong>Số Lượng Ghế Hạng 2:</strong> {{ lich_chuyen_bay.so_luong_hang_ve_2 }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stopover Info Section -->
+    {% if san_bay_trung_gian %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-light shadow-sm rounded-lg">
+                <div class="card-body">
+                    <h5 class="card-title font-weight-bold text-dark">Sân Bay Trung Gian</h5>
+                    <table class="table table-hover text-muted">
+                        <thead>
+                            <tr>
+                                <th class="font-weight-bold">STT</th>
+                                <th class="font-weight-bold">Sân Bay</th>
+                                <th class="font-weight-bold">Thời Gian Dừng</th>
+                                <th class="font-weight-bold">Ghi Chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sbtg in san_bay_trung_gian %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                {% for sanbay in san_bay %}
+                                {% if sbtg.san_bay == sanbay.id %}
+                                <td>{{ sanbay.ten_san_bay }}</td>
+                                {% endif %}
+                                {% endfor %}
+                                <td>{{ dao.gio(sbtg.thoi_gian_dung) }}</td>
+                                <td>{{ sbtg.ghi_chu }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <a href="javascript:;" class="btn btn-lg btn-outline-dark rounded-pill px-5 py-3" style="font-weight: bold;">Mua Vé Ngay</a>
+
+            {% if current_user.is_authenticated %}
+            <button class="btn btn-lg btn-outline-danger rounded-pill px-5 py-3" style="font-weight: bold;">
+                <a href="javascript:;"
+                   onclick="addToCart({{ lich_chuyen_bay.id }}, {{ lich_chuyen_bay.chuyen_bay_id }}, {{ lich_chuyen_bay.price }})"
+                   style="color: inherit; text-decoration: none;">
+                    Thêm Vào Giỏ
+                </a>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
 </div>
 {% endblock %}

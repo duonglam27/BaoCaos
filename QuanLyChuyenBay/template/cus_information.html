@@ -88,7 +88,7 @@
             <input type="text" class="form-control" id="email" placeholder="Nhập email..." name="email{{i}}" required>
         </div>
         <div class="mb-3 mt-3">
-            <label for="cmnd" class="form-label">CCCD/CMND</label>
+            <label for="cccd" class="form-label">CCCD/CMND</label>
             <input type="text" class="form-control" id="cccd" placeholder="Nhập CMND/CCCD" name="CCCD{{i}}" required>
         </div>
     </div>
@@ -105,7 +105,7 @@
                     {%endif%}
             </button>
         {% else %}
-            <p>Bạn chưa đăng nhập!!!Hãy<a href="/login?next=/">đăng nhập</a>!</p>
+            <p>Bạn chưa đăng nhập!!!Hãy<a href="{{ url_for('login_my_user', next='') }}">đăng nhập</a>!</p>
         {% endif %}
     </div>
 

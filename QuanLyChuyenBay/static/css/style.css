@@ -1,0 +1,58 @@
+/* Card styling */
+.card {
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    background-color: #ddd;
+}
+
+/* Price formatting */
+.price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Button styling */
+.btn-outline-primary {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Add to cart button */
+.btn-danger {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Range slider */
+input[type="range"] {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Container adjustments */
+.container {
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+/* Custom styling for carousel images */
+.carousel-inner img {
+    object-fit: cover; /* Ensure the images fit within the container and maintain aspect ratio */
+    height: 400px;      /* Adjust the height of the image */
+    width: 100%;        /* Make the image responsive */
+}
+
+/* Optional: Adjusting the controls position */
+.carousel-control-prev,
+.carousel-control-next {
+    top: 50%; /* Align controls vertically */
+    transform: translateY(-50%);
+}
