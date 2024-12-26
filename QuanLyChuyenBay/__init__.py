@@ -27,8 +27,8 @@ gio_mua_toi_da = 12
 gio_ban_toi_da = 4
 thoi_gian_bay_toi_thieu = 1
 san_bay_trung_gian_toi_da = 5
-thoi_gian_dung_toi_da = 2
-thoi_gian_dung_toi_thieu = 0.1
+thoi_gian_dung_toi_da = 30
+thoi_gian_dung_toi_thieu = 20
 
 VN_PAY_CONFIG = {
     'vnp_TmnCode': 'PMAKVMOW',
@@ -50,3 +50,27 @@ MOMO_CONFIG = {
 # @babel.localeselector
 # def load_locale():
 #     return 'vi'
+
+
+SAN_BAY_TONG_SO = 10
+THOI_GIAN_BAY_TOI_THIEU = 30  # phút
+SAN_BAY_TRUNG_GIAN_TOI_DA = 2
+THOI_GIAN_DUNG_TOI_THIEU = 20  # phút
+THOI_GIAN_DUNG_TOI_DA = 30  # phút
+GIO_BAN_VE_TOI_DA_TRUOC_KH_KHOI_HANH = 4  # giờ
+
+
+class QuyDinh(db.Model):
+    __tablename__ = 'quy_dinh'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    so_luong_san_bay_max = db.Column(db.Integer, nullable=False)
+    thoi_gian_bay_toi_thieu = db.Column(db.Integer, nullable=False)  # Thời gian bay tối thiểu tính bằng phút
+    so_san_bay_trung_gian_max = db.Column(db.Integer, nullable=False)
+    thoi_gian_dung_min = db.Column(db.Integer, nullable=False)  # Thời gian dừng tối thiểu tại sân bay trung gian
+    thoi_gian_dung_max = db.Column(db.Integer, nullable=False)  # Thời gian dừng tối đa tại sân bay trung gian
+    so_luong_hang_ve = db.Column(db.Integer, nullable=False)  # Số lượng hạng vé
+    thoi_gian_ban_ve = db.Column(db.Integer, nullable=False)  # Thời gian bán vé (ví dụ: 48 giờ trước chuyến bay)
+    thoi_gian_dat_ve = db.Column(db.Integer,
+                                 nullable=False)  # Thời gian đặt vé trước chuyến bay (ví dụ: 30 phút trước chuyến bay)
+    don_gia_ve = db.Column(db.Float, nullable=False)  # Đơn giá vé mặc định
+

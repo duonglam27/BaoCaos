@@ -1,0 +1,28 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-gradient text-white text-center p-4" style="background: linear-gradient(90deg, #0056b3, #6610f2);">
+            <h2 class="fw-bold">Xác Nhận Thanh Toán</h2>
+        </div>
+
+        <div class="card-body p-5">
+            <h4 class="text-center mb-4">Vui lòng chọn phương thức thanh toán:</h4>
+
+            <div class="d-flex justify-content-center">
+                <!-- Thanh toán Momo -->
+                <button class="btn btn-lg btn-success w-50 py-3 mx-2 rounded-pill shadow"
+                        onclick="window.location.href='{{ url_for('momo_payment', chuyen_bay_id=chuyen_bay.id, hang_ve=hang_ve) }}'">
+                    Thanh toán qua Momo
+                </button>
+                <!-- Thanh toán VNPay -->
+                <button class="btn btn-lg btn-primary w-50 py-3 mx-2 rounded-pill shadow"
+                        onclick="window.location.href='{{ url_for('vnpay_payment', chuyen_bay_id=chuyen_bay.id, hang_ve=hang_ve) }}'">
+                    Thanh toán qua VNPay
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -36,6 +36,21 @@ def load_may_bay():
 def load_tuyen_bay():
     return TuyenBay.query.all()
 
+
+
+def get_available_flights(self, time_limit):
+    # Make sure to use the 'time_limit' parameter to filter flights
+    query = """
+    SELECT * FROM flights
+    WHERE departure_time > %s
+    AND available_seats > 0
+    """
+    return self.db.execute(query, (time_limit,))
+
+
+def load_ve():
+    return Ve.query.all()
+
 def load_san_bay():
     return SanBay.query.all()
 
@@ -91,6 +106,8 @@ def auth_user(username, password):
 
     return User.query.filter(User.username.__eq__(username.strip()),
                              User.password.__eq__(password)).first()
+
+
 
 
 def get_available_seats(may_bay_id, ticket_class):
@@ -224,3 +241,25 @@ def sell_ticket(khach_hang_id, chuyen_bay_id, hang_ghe, gia_ve, user_id):
     db.session.add(ve_moi)
     db.session.commit()
     return ve_moi
+
+
+
+def get_doanh_thu_theo_thang(thang):
+    query = """
+    SELECT tuyen_bay.id, 
+           CONCAT(san_bay_di.ten_sb, ' - ', san_bay_den.ten_sb) AS ten_tuyen_bay,
+           SUM(CASE WHEN ghe_may_bay.hang_ghe = 'hang_1' THEN chuyen_bay.gia_ve_hang_1 ELSE 0 END) AS doanh_thu_hang_1, 
+           SUM(CASE WHEN ghe_may_bay.hang_ghe = 'hang_2' THEN chuyen_bay.gia_ve_hang_2 ELSE 0 END) AS doanh_thu_hang_2,
+           COUNT(ve.id) AS so_luot_bay
+    FROM ve
+    JOIN ghe_may_bay ON ve.ghe_id = ghe_may_bay.id
+    JOIN chuyen_bay ON ve.chuyen_bay_id = chuyen_bay.id
+    JOIN tuyen_bay ON chuyen_bay.tuyen_bay_id = tuyen_bay.id
+    JOIN san_bay AS san_bay_di ON tuyen_bay.san_bay_di_id = san_bay_di.id
+    JOIN san_bay AS san_bay_den ON tuyen_bay.san_bay_den_id = san_bay_den.id
+    JOIN hoa_don ON ve.hoa_don_id = hoa_don.id
+    WHERE EXTRACT(MONTH FROM hoa_don.ngay_thanh_toan) = :thang
+    GROUP BY tuyen_bay.id, san_bay_di.ten_sb, san_bay_den.ten_sb
+    """
+    return db.session.execute(query, {'thang': thang}).fetchall()
+

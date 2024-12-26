@@ -269,4 +269,3 @@ if __name__ == '__main__':
             #                    phuong_thuc_thanh_toan="Chuyển khoản")
             # db.session.add_all([hoa_don_1, hoa_don_2, hoa_don_3])
             db.session.commit()
-

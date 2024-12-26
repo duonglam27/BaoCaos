@@ -1,0 +1,25 @@
+<form method="POST">
+    <label for="chuyen_bay_id">Chuyến bay:</label>
+    <select name="chuyen_bay_id">
+        {% for chuyen_bay in chuyen_bays %}
+            <option value="{{ chuyen_bay.id }}">{{ chuyen_bay.ten_chuyen_bay }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="hang_ve">Hạng vé:</label>
+    <select name="hang_ve">
+        <option value="hang_1">Hạng 1</option>
+        <option value="hang_2">Hạng 2</option>
+    </select>
+
+    <label for="ten_khach_hang">Tên khách hàng:</label>
+    <input type="text" name="ten_khach_hang">
+
+    <label for="cccd">CMND/CCCD:</label>
+    <input type="text" name="cccd">
+
+    <label for="dien_thoai">Điện thoại:</label>
+    <input type="text" name="dien_thoai">
+
+    <button type="submit">Bán vé</button>
+</form>

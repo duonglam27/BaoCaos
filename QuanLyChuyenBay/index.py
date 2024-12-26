@@ -1,3 +1,4 @@
+
 from datetime import datetime
 import time
 from QuanLyChuyenBay import app, dao, admin, login, utils
@@ -11,11 +12,7 @@ from QuanLyChuyenBay.dao import load_san_bay, get_chuyen_bay_by_id, get_availabl
 from QuanLyChuyenBay.models import ChuyenBay, SanBayTrungGian, TuyenBay, KhachHang, GioiTinhEnum, SanBay, GheMayBay, Ve, \
     MayBay
 from flask import render_template
-import json
-import uuid
-import requests
-import hmac
-import hashlib
+
 
 
 @app.route('/')
@@ -118,6 +115,25 @@ def tra_cuu_chuyen_bay():
                            from_place=from_place, to_place=to_place, date=date, chuyen_bays=chuyen_bays)
 
 
+@app.route('/ordernow', methods=['GET', 'POST'])
+def tra_cuu_chuyen_bay_staff():
+    ten_dia_diem = load_san_bay()
+    from_place = ''
+    to_place = ''
+    date = ''
+    chuyen_bays = []
+
+    if request.method == 'POST':
+        from_place = request.form.get('from', '')
+        to_place = request.form.get('to', '')
+        date = request.form.get('date', '')
+        chuyen_bays = dao.load_chuyen_bay(from_place, to_place, date)
+
+    return render_template('ordernow.html', ten_dia_diem=ten_dia_diem,
+                           from_place=from_place, to_place=to_place, date=date, chuyen_bays=chuyen_bays)
+
+
+
 @app.route('/detail_flight/<int:flight_id>')
 def detail_flight(flight_id):
     chuyen_bay = dao.get_chuyen_bay_by_id(flight_id)
@@ -132,6 +148,37 @@ def detail_flight(flight_id):
     return render_template('detail_flight.html', chuyen_bay=chuyen_bay, tuyen_bay=tuyen_bay, san_bay_di=san_bay_di,
                            san_bay_den=san_bay_den, from_place=from_place, to_place=to_place, date=date)
 
+
+@app.route('/thanh-toan/<int:chuyen_bay_id>/<string:hang_ve>', methods=['GET', 'POST'])
+def thanh_toan(chuyen_bay_id, hang_ve):
+    # Truy xuất thông tin chuyến bay
+    chuyen_bay = dao.get_chuyen_bay_by_id(chuyen_bay_id)
+
+    # Cấu hình giá vé dựa trên hạng vé
+    if hang_ve == 'hang_1':
+        gia_ve = chuyen_bay.gia_ve_hang_1
+    else:
+        gia_ve = chuyen_bay.gia_ve_hang_2
+
+    # Truyền thông tin vào template thanh toán
+    return render_template('thanh_toan.html', chuyen_bay=chuyen_bay, hang_ve=hang_ve, gia_ve=gia_ve)
+
+
+@app.route('/xacnhanthanhtoan/<int:chuyen_bay_id>/<hang_ve>', methods=['GET', 'POST'])
+def xac_nhan_thanh_toan(chuyen_bay_id, hang_ve):
+    # Lấy thông tin chuyến bay và hạng vé
+    chuyen_bay = dao.get_chuyen_bay_by_id(chuyen_bay_id)
+
+    if hang_ve == 'hang_1':
+        gia_ve = chuyen_bay.gia_ve_hang_1
+    elif hang_ve == 'hang_2':
+        gia_ve = chuyen_bay.gia_ve_hang_2
+    else:
+        # Nếu không phải hạng 1 hoặc hạng 2, trả về trang lỗi hoặc thông báo
+        return "Hạng vé không hợp lệ", 400
+
+    # Truyền thông tin chuyến bay và hạng vé vào trang xác nhận thanh toán
+    return render_template('xac_nhan_thanh_toan.html', chuyen_bay=chuyen_bay, gia_ve=gia_ve, hang_ve=hang_ve)
 
 
 @app.route('/seats/<int:chuyenbay_id>/<ticket_class>')
@@ -171,53 +218,8 @@ def customer(flight_id, ticket_class):
 
 
 
-@app.route('/process_payment/<int:flight_id>/<string:ticket_class>', methods=['POST'])
-@login_required
-def process_payment(flight_id, ticket_class):
-    ten_khach_hang = request.form.get('ten_khach_hang')
-    gioi_tinh = request.form.get('gioi_tinh')
-    if gioi_tinh == 'Nam':
-        gioi_tinh = GioiTinhEnum.NAM
-    elif gioi_tinh == 'Nu':
-        gioi_tinh = GioiTinhEnum.NU
-    elif gioi_tinh == 'Khac':
-        gioi_tinh = GioiTinhEnum.KHAC
-    sdt = request.form.get('sdt')
-    dia_chi = request.form.get('dia_chi')
-    email = request.form.get('email')
-    CCCD = request.form.get('CCCD')
-    user_id = current_user.id
 
-    # Kiểm tra xem CCCD đã tồn tại chưa
-    khach_hang = KhachHang.query.filter_by(CCCD=CCCD).first()
-    if khach_hang:
-        # Nếu CCCD đã tồn tại, thông báo lỗi và yêu cầu điền lại thông tin
-        error_msg = "CCCD đã tồn tại, vui lòng kiểm tra lại thông tin."
-        return render_template('customer.html', flight_id=flight_id, ticket_class=ticket_class, error_msg=error_msg,
-                               ten_khach_hang=ten_khach_hang, gioi_tinh=gioi_tinh, sdt=sdt, dia_chi=dia_chi,
-                               email=email, CCCD=CCCD)
-
-    # Lưu thông tin khách hàng vào cơ sở dữ liệu
-    khach_hang = KhachHang(
-        ten_khach_hang=ten_khach_hang,
-        gioi_tinh=gioi_tinh,
-        sdt=sdt,
-        dia_chi=dia_chi,
-        email=email,
-        CCCD=CCCD
-    )
-    db.session.add(khach_hang)
-    db.session.commit()
-
-    chuyen_bay = dao.get_chuyen_bay_by_id(flight_id)
-    gia_ve = chuyen_bay.gia_ve_hang_1 if ticket_class == 'hang_1'else chuyen_bay.gia_ve_hang_2
-
-    # Chuyển hướng đến trang thanh toán với thông tin khách hàng
-    return render_template('pay.html', chuyen_bay=chuyen_bay, gia_ve=gia_ve, hang=ticket_class,
-                           khach_hang_id=khach_hang.id)
-
-
-@app.route('/momo_payment/<int:flight_id>/<string:ticket_class>', methods=['POST'])
+@app.route('/momo_payment/<int:chuyen_bay_id>/<string:hang_ve>', methods=['POST'])
 @login_required
 def momo_payment(flight_id, ticket_class):
     try:
@@ -258,7 +260,7 @@ def momo_return():
         return str(e)
 
 
-@app.route('/vnpay_payment/<int:flight_id>/<string:ticket_class>', methods=['POST'])
+@app.route('/vnpay_payment/<int:chuyen_bay_id>/<string:hang_ve>', methods=['POST'])
 @login_required
 def vnpay_payment(flight_id, ticket_class):
     try:
@@ -296,6 +298,28 @@ def vnpay_return():
             return "Thanh toán bằng VNPay thất bại!"
     except Exception as e:
         return str(e)
+
+
+@app.route('/xac_nhan_thanh_toan-success/<int:chuyen_bay_id>/<string:hang_ve>', methods=['POST'])
+@login_required
+def xac_nhan_thanh_toan_success(chuyen_bay_id, hang_ve):
+    try:
+        # Handle successful payment logic here
+        return "Payment Successful!"
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/xac_nhan_thanh_toan-failure/<int:chuyen_bay_id>/<string:hang_ve>', methods=['POST'])
+@login_required
+def xac_nhan_thanh_toan_failure(chuyen_bay_id, hang_ve):
+    try:
+        # Handle failed payment logic here
+        return "Payment Failed!"
+    except Exception as e:
+        return str(e)
+
+
 
 @app.route('/tao_san_bay', methods=['GET', 'POST'])
 def tao_san_bay():

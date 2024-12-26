@@ -1,0 +1,63 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<h1>Báo cáo doanh thu theo tháng: {{ thang_chon }}</h1>
+<form method="POST">
+    <label for="thang">Chọn tháng:</label>
+    <input type="text" id="thang" name="thang" placeholder="MM" required>
+    <button type="submit">Xem báo cáo</button>
+</form>
+<h2>Tổng doanh thu: {{ tong_doanh_thu }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tuyến bay</th>
+            <th>Doanh thu hạng 1</th>
+            <th>Doanh thu hạng 2</th>
+            <th>Số lượt bay</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for index, row in doanh_thu_bao_cao %}
+        <tr>
+            <td>{{ index + 1 }}</td>
+            <td>{{ row.ten_tuyen_bay }}</td>
+            <td>{{ row.doanh_thu_hang_1 }}</td>
+            <td>{{ row.doanh_thu_hang_2 }}</td>
+            <td>{{ row.so_luot_bay }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<canvas id="revenueChart"></canvas>
+<script>
+var ctx = document.getElementById('revenueChart').getContext('2d');
+var revenueChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [{% for row in doanh_thu_bao_cao %}'{{ row.ten_tuyen_bay }}',{% endfor %}],
+        datasets: [{
+            label: 'Doanh thu hạng 1',
+            data: [{% for row in doanh_thu_bao_cao %}{{ row.doanh_thu_hang_1 }},{% endfor %}],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }, {
+            label: 'Doanh thu hạng 2',
+            data: [{% for row in doanh_thu_bao_cao %}{{ row.doanh_thu_hang_2 }},{% endfor %}],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

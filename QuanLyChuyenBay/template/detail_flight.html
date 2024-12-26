@@ -46,14 +46,16 @@
                 <div class="col-md-6 text-center">
                     <div class="mb-4">
                         <p class="fw-bold text-secondary">Hạng Ghế 1</p>
+                        <a href="{{ url_for('thanh_toan', chuyen_bay_id=chuyen_bay.id, hang_ve='hang_1') }}"
                            class="btn btn-lg btn-success w-100 py-3 rounded-pill shadow">
                             {{ chuyen_bay.gia_ve_hang_1 }} VND
                         </a>
                     </div>
                     <div>
                         <p class="fw-bold text-secondary">Hạng ghế 2</p>
+                        <a href="{{ url_for('thanh_toan', chuyen_bay_id=chuyen_bay.id, hang_ve='hang_2') }}"
                            class="btn btn-lg btn-primary w-100 py-3 rounded-pill shadow">
-                            {{ chuyen_bay.gia_ve_hang_2}} VND
+                            {{ chuyen_bay.gia_ve_hang_2 }} VND
                         </a>
                     </div>
                 </div>
