@@ -1,9 +1,8 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark header-bg">
     <div class="container-fluid">
-
         <a class="navbar-brand" href="/">
             <img style="width: 70px;"
-                 class="rounded mx-auto d-blockd"
+                 class="rounded mx-auto d-block"
                  src="https://res.cloudinary.com/dtkzgdef1/image/upload/v1734450529/logolk_lxptkt.png"
                  alt="LUCKY AIR"> LUCKY AIR
         </a>
@@ -21,7 +20,7 @@
                     <h5>
                         <a class="nav-link" href="/order">
                             {% if current_user.is_authenticated %}
-                            {% if current_user.isAdmin() or current_user.isStaff() %}
+                            {% if current_user.is_staff() %}
                             Bán vé
                             {%else%}
                             Mua vé
@@ -32,19 +31,18 @@
                 </li>
 
                 {% if current_user.is_authenticated %}
-                <ul class="navbar-nav ml-auto" style="position: absolute;right: 50px">
+                <ul class="navbar-nav ml-auto" style="position: absolute; right: 50px">
                     <li class="nav-item">
-                        <a class="nav-link text-success" href="/">
-                            {% if current_user.avatar %}
-                            <img src="{{ current_user.avatar }}" width="40" class="rounded-circle"
+                        <a class="nav-link text-success">
+                            {% if current_user.anh_dai_dien %}
+                            <img src="{{ current_user.anh_dai_dien }}" width="40" class="rounded-circle"
                                  alt="{{ current_user.name }}"/>
                             {% else %}
                             <img src="https://res.cloudinary.com/dbqaequqv/image/upload/v1710207625/samples/shoe.jpg"
                                  width="40" class="rounded-circle"
                                  alt="{{ current_user.name }}"/>
                             {% endif %}
-                            Chào <span class="text-info">{{ current_user.name }}</span>
-                            <span class="text-info">{{ typeis }}</span>
+                            Chào <span class="text-success">{{ current_user.name }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -53,7 +51,7 @@
                 </ul>
 
                 {% else %}
-                <ul class="navbar-nav ml-auto" style="position: absolute;right: 50px">
+                <ul class="navbar-nav ml-auto" style="position: absolute; right: 50px">
                     <li class="nav-item">
                         <a class="nav-link text-success" href="/login">Đăng nhập</a>
                     </li>
@@ -62,37 +60,37 @@
                     </li>
                 </ul>
                 {% endif %}
-                {% if current_user.is_authenticated %}
 
-                {% if current_user.isAdmin() or current_user.isStaff()%}
+                {% if current_user.is_authenticated %}
+                {% if current_user.is_staff() %}
                 <li class="nav-item">
                     <h5>
-                        <a class="nav-link" href="{{ url_for('AddFlightSchedule') }}">
-                            Lập lịch
+                        <a class="nav-link" href="/tao_chuyen_bay">
+                            Lập Lịch Bay
                         </a>
                     </h5>
                 </li>
                 {% endif %}
 
-                {% if current_user.isAdmin() %}
+                {% if current_user.is_admin() %}
                 <li class="nav-item">
                     <h5>
-                        <a class="nav-link" href="{{ url_for('RuleChange') }}">
+                        <a class="nav-link" href="/">
                             Quy định
                         </a>
                     </h5>
                 </li>
-                {%endif%}
+                {% endif %}
 
-                {% if current_user.isUser()%}
+                {% if current_user.is_user() %}
                 <li class="nav-item">
-
-                    <h5><a class="nav-link" href="{{ url_for('cart') }}">&#128722; Giỏ hàng <span
-                            class="badge bg-danger cart-counter">{{ cart.total_quantity }}</span></a></h5>
+                    <h5>
+                        <a class="nav-link">Vé <span class="badge bg-danger cart-counter"
+                                style="font-size: 9px;"></span></a>
+                    </h5>
                 </li>
-                {%endif%}
-                {%endif%}
-
+                {% endif %}
+                {% endif %}
             </ul>
         </div>
     </div>

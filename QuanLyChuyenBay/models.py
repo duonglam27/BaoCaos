@@ -1,270 +1,272 @@
 import hashlib
+from datetime import datetime
+import math
 
-from QuanLyChuyenBay import db
+from flask_admin import Admin
+from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Float, Enum
 from sqlalchemy.orm import relationship, backref
-from datetime import datetime
-from QuanLyChuyenBay import app
 from enum import Enum as UserEnum
 from enum import Enum as HangVeEnum
 from enum import Enum as Sex
-from flask_login import UserMixin
-import math
+from QuanLyChuyenBay import db, app
 
 
-class UserRole(UserEnum):
-    ADMIN = 1
-    STAFF = 2
-    USER = 3
+from enum import Enum
 
 
-class Sex(Sex):
-    Nam = 1
-    Nu = 2
+
+class GioiTinhEnum(Enum):
+    NAM = 'Nam'
+    NU = 'Nu'
+    KHAC = 'Khac'
+
+# Bảng Role
+class Role(db.Model):
+    __tablename__ = 'role'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ten_role = db.Column(db.String(50), nullable=False)
+
+# Bảng Sân bay
+class SanBay(db.Model):
+    __tablename__ = 'san_bay'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ten_sb = db.Column(db.String(100), nullable=False)
+    ten_khu_vuc = db.Column(db.String(100), nullable=False)
+
+# Bảng Tuyến bay
+class TuyenBay(db.Model):
+    __tablename__ = 'tuyen_bay'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    san_bay_di_id = db.Column(db.Integer, db.ForeignKey('san_bay.id'), nullable=False)
+    san_bay_den_id = db.Column(db.Integer, db.ForeignKey('san_bay.id'), nullable=False)
+    khoang_cach = db.Column(db.Float, nullable=False)
+    thoi_gian_bay = db.Column(db.Integer, nullable=False)
+
+    # Backref to easily access SanBay in the reverse direction
+    san_bay_di = db.relationship('SanBay', foreign_keys=[san_bay_di_id], backref=backref('tuyen_bay_di', lazy=True))
+    san_bay_den = db.relationship('SanBay', foreign_keys=[san_bay_den_id], backref=backref('tuyen_bay_den', lazy=True))
+
+# Bảng Sân bay trung gian
+class SanBayTrungGian(db.Model):
+    __tablename__ = 'san_bay_trung_gian'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tuyen_bay_id = db.Column(db.Integer, db.ForeignKey('tuyen_bay.id'), nullable=False)
+    san_bay_id = db.Column(db.Integer, db.ForeignKey('san_bay.id'), nullable=False)
+    thu_tu_dung = db.Column(db.Integer, nullable=False)
+    thoi_gian_dung = db.Column(db.Integer, nullable=False)
+    ghi_chu = db.Column(db.String(255))
+
+    # Backref for SanBay relationship
+    tuyen_bay = db.relationship('TuyenBay', backref=backref('san_bay_trung_gian', lazy=True))
+    san_bay = db.relationship('SanBay', backref=backref('san_bay_trung_gian', lazy=True))
+
+# Bảng Máy bay
+class MayBay(db.Model):
+    __tablename__ = 'may_bay'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ten_may_bay = db.Column(db.String(100), nullable=False)
+    tinh_trang_hoat_dong = db.Column(db.Boolean, nullable=False)
+    so_luong_hang_ghe_1 = db.Column(db.Integer, nullable=False)
+    so_luong_hang_ghe_2 = db.Column(db.Integer, nullable=False)
+    nam_san_xuat = db.Column(db.DateTime, nullable=False)
 
 
-class LoaiHangVe(HangVeEnum):
-    HangVe1 = 1
-    HangVe2 = 2
+# Bảng Ghế máy bay
+class GheMayBay(db.Model):
+    __tablename__ = 'ghe_may_bay'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    may_bay_id = db.Column(db.Integer, db.ForeignKey('may_bay.id'), nullable=False)
+    ten_ghe = db.Column(db.String(10), nullable=False)
+    hang_ghe = db.Column(db.String(10), nullable=False)
+    trang_thai_ghe = db.Column(db.Boolean, nullable=False)
+
+    # Backref to MayBay
+    may_bay = db.relationship('MayBay', backref=db.backref('ghe_may_bays', lazy=True))
+
+# Bảng Chuyến bay
+class ChuyenBay(db.Model):
+    __tablename__ = 'chuyen_bay'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ten_chuyen_bay = db.Column(db.String(100), nullable=False)
+    tuyen_bay_id = db.Column(db.Integer, db.ForeignKey('tuyen_bay.id'), nullable=False)
+    may_bay_id = db.Column(db.Integer, db.ForeignKey('may_bay.id'), nullable=False)
+    ngay_gio_bay = db.Column(db.DateTime, nullable=False)
+    gia_ve_hang_1 = db.Column(db.Float, nullable=False)
+    gia_ve_hang_2 = db.Column(db.Float, nullable=False)
+
+    # Backref to TuyenBay
+    tuyen_bay = db.relationship('TuyenBay', backref=backref('chuyen_bay', lazy=True))
+    may_bay = db.relationship('MayBay', backref=db.backref('chuyen_bay', lazy=True))
 
 
-class BaseModel(db.Model):
-    __abstract__ = True
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-
-class MayBay(BaseModel):
-    loai_may_bay = Column(String(50), nullable=False)
-    TinhTrangRanh = Column(Boolean, default=True)
-    so_luong_cho_ngoi = Column(Integer, nullable=False)
-    chuyen_bay = relationship('LichChuyenBay', backref='MayBay', lazy=True)
-
-    def __str__(self):
-        return self.loai_may_bay
+# Bảng Khách hàng
+class KhachHang(db.Model):
+    __tablename__ = 'khach_hang'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ten_khach_hang = db.Column(db.String(100), nullable=False)
+    sdt = db.Column(db.String(10), nullable=False)
+    CCCD=db.Column(db.String(12),unique=True, nullable=False)
 
 
-class SanBay(BaseModel):
-    ten_san_bay = Column(String(50), nullable=False)
-    dia_diem = Column(String(50), nullable=False)
-    tinh_trang_con_trong = Column(Boolean, default=True)
-    #   lich_chuyen_bay = relationship('LichChuyenBay',backref = 'SanBay',lazy = False)
-    ten_san_bay = Column(String(50), nullable=False)
-    dia_diem = Column(String(50), nullable=False)
-    tinh_trang_con_trong = Column(Boolean, default=True)
-
-    # san_bay_trung_gian = relationship('SanbayTrungGian', backref='san_bay_id', lazy=True)
-
-    # lich_chuyen_bay = relationship('LichChuyenBay',backref = 'SanBay',lazy = False)
-    # chuyen_bay = relationship = relationship('ChuyenBay',backref = 'SanBay', lazy = False)
-    def __str__(self):
-        return self.ten_san_bay
 
 
-class ChuyenBay(BaseModel):
-    ten_chuyen_bay = Column(String(50), nullable=False)
-    san_bay_di_id = Column(Integer, ForeignKey(SanBay.id), nullable=False)
-    san_bay_den_id = Column(Integer, ForeignKey(SanBay.id), nullable=False)
+# Bảng Vé
+class Ve(db.Model):
+    __tablename__ = 've'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    khach_hang_id = db.Column(db.Integer, db.ForeignKey('khach_hang.id'), nullable=False)
+    chuyen_bay_id = db.Column(db.Integer, db.ForeignKey('chuyen_bay.id'), nullable=False)
+    hoa_don_id = db.Column(db.Integer, db.ForeignKey('hoa_don.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    ghe_id = db.Column(db.Integer, db.ForeignKey('ghe_may_bay.id'), nullable=False)
 
-    san_bay_di = relationship('SanBay', foreign_keys=[san_bay_di_id])
-    san_bay_den = relationship('SanBay', foreign_keys=[san_bay_den_id], overlaps="san_bay_di")
-    # may_bay = relationship('MayBay', foreign_keys=[may_bay_id],overlaps="MayBay,chuyen_bay")
-
-    trang_thai = Column(Boolean, default=True)
-    lich_chuyen_bay = relationship("LichChuyenBay", backref="ChuyenBay", lazy=True)
-
-    def __str__(self):
-        return str(self.lich_chuyen_bay)
-
-    def __str__(self):
-        return self.ten_chuyen_bay
+    # Backref to ChuyenBay
+    chuyen_bay = db.relationship('ChuyenBay', backref=backref('ve', lazy=True))
+    khach_hang = db.relationship('KhachHang', backref=backref('khach_hang', lazy=True))
 
 
-class LichChuyenBay(BaseModel):
-    chuyen_bay_id = Column(Integer, ForeignKey(ChuyenBay.id), nullable=False)
-    may_bay_id = Column(Integer, ForeignKey(MayBay.id), nullable=False)
-    ngay_gio = Column(DateTime, default=datetime.now())
-    thoi_gian_bay = Column(Float, nullable=False)
-    so_luong_hang_ve_1 = Column(Integer, nullable=False)
-    so_luong_hang_ve_2 = Column(Integer, nullable=False)
-    image = Column(String(200))
-    san_bay_trung_gian = relationship('SanBay', secondary='san_bay_trung_gian', lazy='subquery',
-                                      backref=backref('lich_chuyen_bay', lazy=True))
-    trang_thai_cho_ngoi = Column(Boolean, default=True)
-    price = Column(Float, nullable=False)
-    trang_thai_cho_ngoi = Column(Boolean, default=True)
-    price = Column(Float, nullable=False)
-    ticketdetails = relationship('TicketDetail', backref='lich_chuyen_bay', lazy=True)
-
-    def gio(self):
-        return str(math.floor(self.thoi_gian_bay)) + 'h' + str(
-            round(self.thoi_gian_bay - math.floor(self.thoi_gian_bay), 3) * 60) + 'p'
-
-    def _int__(self):
-        return self.chuyen_bay_id
+# Bảng Hóa đơn
+class HoaDon(db.Model):
+    __tablename__ = 'hoa_don'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ngay_thanh_toan = db.Column(db.DateTime, nullable=False)
+    tong_tien = db.Column(db.Float, nullable=False)
+    phuong_thuc_thanh_toan = db.Column(db.String(50), nullable=False)
 
 
-san_bay_trung_gian = db.Table('san_bay_trung_gian',
-                              Column('lich_chuyen_bay_id', Integer, ForeignKey(LichChuyenBay.id), primary_key=True),
-                              Column('san_bay', Integer, ForeignKey(SanBay.id), primary_key=True),
-                              Column('thoi_gian_dung', Float, nullable=False, default=2),
-                              Column('ghi_chu', String(200)))
+# Bảng User
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
 
+    user_role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False)
+    anh_dai_dien = db.Column(db.String(255), nullable=True)
 
-# class SanbayTrungGian(BaseModel):
-#     lich_chuyen_bay = Column(Integer, ForeignKey(LichChuyenBay.id), nullable=False)
-#     san_bay = Column(Integer, ForeignKey(SanBay.id), nullable=False)
-#     thoi_gian_dung = Column(Float,nullable = False)
-#     ghichu = Column(String(200),default = 'Không')
-#     def gio(self):
-#         return  str(math.floor(self.thoi_gian_dung))+'h'+str(round(self.thoi_gian_dung -math.floor(self.thoi_gian_dung),3)*60)+'p'
+    role = db.relationship('Role', backref=db.backref('users', lazy=True))
 
-
-class User(db.Model, UserMixin):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False)
-    username = Column(String(50), nullable=False)
-    password = Column(String(50), nullable=False)
-    avatar = Column(String(200), nullable=False)
-    active = Column(Boolean, default=True)
-    user_role = Column(Enum(UserRole), default=UserRole.USER)
-    id_ticket = relationship('Ticket', backref='userid', lazy=True)
-
-    def __str__(self):
-        return self.name
-
-    def isAdmin(self):
-        if self.user_role == UserRole.ADMIN:
-            return True
-        return False
-
-    def isStaff(self):
-        if self.user_role == UserRole.STAFF:
-            return True
-        return False
-
-    def isUser(self):
-        if self.user_role == UserRole.USER:
-            return True
-        return False
-
-
-class Customer(BaseModel):
-    name = Column(String(50), nullable=False)
-    sex = Column(Enum(Sex), default=Sex.Nam)
-    phone = Column(String(11), nullable=False)
-    address = Column(String(50), nullable=False)
-    email = Column(String(50), nullable=True)
-    CCCD = Column(String(12), nullable=False)
-    ticket_id = relationship('Ticket', backref='customerid', lazy=True)
+    # Backref for Ve relationship (User can have many tickets)
+    ve = db.relationship('Ve', backref=backref('user', lazy=True))
 
     def __str__(self):
         return self.name
 
+    @property
+    def is_active(self):
+        return True
 
-class Ticket(BaseModel):
-    id_user = Column(Integer, ForeignKey(User.id), nullable=False)
-    # id_kh = Column(Integer, ForeignKey(User.id), nullable=False)
-    so_ghe = Column(String(50), nullable=False)
-    hang_ve = Column(Enum(LoaiHangVe), default=LoaiHangVe.HangVe1)
-    details = relationship('TicketDetail', backref='Ticket', lazy=True)
-    customer = Column(Integer, ForeignKey(Customer.id), nullable=True)
+    @property
+    def is_authenticated(self):
+        return True
 
-    # kh = relationship('User', foreign_keys=[id_kh])
+    @property
+    def is_anonymous(self):
+        return False
 
-    def hangVe(self):
-        if self.hang_ve == LoaiHangVe.HangVe1:
-            return "Hạng vé 1"
-        if self.hang_ve == LoaiHangVe.HangVe2:
-            return "Hạng vé 2"
-        pass
+    def get_id(self):
+        return str(self.id)
 
+    def is_admin(self):
+        return self.user_role_id == 1
 
-# dat ve chuyen bay?
-class TicketDetail(BaseModel):
-    lich_chuyen_bay_id = Column(Integer, ForeignKey(LichChuyenBay.id), nullable=False)
-    id_ve = Column(Integer, ForeignKey(Ticket.id), nullable=False)
-    price = Column(Float, default=0)
-    created_day = Column(DateTime, default=datetime.now())
+    def is_staff(self):
+        return self.user_role_id == 2
+
+    def is_user(self):
+        return self.user_role_id == 3
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
+        with app.app_context():
 
-        # Thêm dữ liệu mẫu cho MayBay (Máy bay)
-        m1 = MayBay(loai_may_bay='AIRBUS A330', so_luong_cho_ngoi=272)
-        m2 = MayBay(loai_may_bay='AIRBUS A350', so_luong_cho_ngoi=350)
-        m3 = MayBay(loai_may_bay='BOEING 787', so_luong_cho_ngoi=215)
-        db.session.add_all([m1, m2, m3])
-        db.session.commit()
+        # db.drop_all()
 
+            db.create_all()
 
-        # Thêm dữ liệu mẫu cho SanBay (Sân bay)
-        sb1 = SanBay(ten_san_bay="Nội Bài", dia_diem='Hà Nội')
-        sb2 = SanBay(ten_san_bay='Tân Sơn Nhất', dia_diem='TPHCM')
-        db.session.add_all([sb1, sb2])
-        db.session.commit()
+            # Tạo dữ liệu mẫu cho bảng Role
+            # role1 = Role(ten_role="Admin")
+            # role2 = Role(ten_role="User")
+            # role3 = Role(ten_role="Guest")
+            # db.session.add_all([role1, role2, role3])
 
+            # Tạo dữ liệu mẫu cho bảng User
+            # user1 = User(name="Nguyen Van A", username="nguyenvana", password="password", user_role_id=1)
+            # user2 = User(name="Le Thi B", username="lethib", password="password", user_role_id=2)
+            # user3 = User(name="Tran Van C", username="tranvanc", password="password", user_role_id=3)
+            # db.session.add_all([user1, user2, user3])
 
-        # Thêm dữ liệu mẫu cho ChuyenBay (Chuyến bay)
-        cb1 = ChuyenBay(ten_chuyen_bay="Hà Nội - TPHCM", san_bay_di=sb1, san_bay_den=sb2)
-        db.session.add(cb1)
-        db.session.commit()
+            # # Tạo dữ liệu mẫu cho bảng SanBay
+            # san_bay_1 = SanBay(ten_sb="Tan Son Nhat", ten_khu_vuc="Ho Chi Minh")
+            # san_bay_2 = SanBay(ten_sb="Noi Bai", ten_khu_vuc="Ha Noi")
+            # san_bay_3 = SanBay(ten_sb="Da Nang", ten_khu_vuc="Da Nang")
+            # db.session.add_all([san_bay_1, san_bay_2, san_bay_3])
+            #
+            # # Tạo dữ liệu mẫu cho bảng TuyenBay
+            # tuyen_bay_1 = TuyenBay(san_bay_di_id=1, san_bay_den_id=2, khoang_cach=1150.0, thoi_gian_bay=120)
+            # tuyen_bay_2 = TuyenBay(san_bay_di_id=2, san_bay_den_id=3, khoang_cach=800.0, thoi_gian_bay=90)
+            # tuyen_bay_3 = TuyenBay(san_bay_di_id=3, san_bay_den_id=1, khoang_cach=850.0, thoi_gian_bay=100)
+            # db.session.add_all([tuyen_bay_1, tuyen_bay_2, tuyen_bay_3])
+            #
+            # # Tạo dữ liệu mẫu cho bảng SanBayTrungGian
+            # san_bay_trung_gian_1 = SanBayTrungGian(tuyen_bay_id=1, san_bay_id=1, thu_tu_dung=1, thoi_gian_dung=30,
+            #                                        ghi_chu="Dung de tiep nhien lieu")
+            # san_bay_trung_gian_2 = SanBayTrungGian(tuyen_bay_id=2, san_bay_id=2, thu_tu_dung=1, thoi_gian_dung=25,
+            #                                        ghi_chu="Dung de tiep nhien lieu")
+            # san_bay_trung_gian_3 = SanBayTrungGian(tuyen_bay_id=3, san_bay_id=3, thu_tu_dung=1, thoi_gian_dung=35,
+            #                                        ghi_chu="Dung de tiep nhien lieu")
+            # db.session.add_all([san_bay_trung_gian_1, san_bay_trung_gian_2, san_bay_trung_gian_3])
 
+            # # Tạo dữ liệu mẫu cho bảng MayBay
+            # may_bay_1 = MayBay(ten_may_bay="Boeing 737", tinh_trang_hoat_dong=True, so_luong_hang_ghe_1=20,
+            #                    so_luong_hang_ghe_2=80, nam_san_xuat=datetime(2015, 5, 21))
+            # may_bay_2 = MayBay(ten_may_bay="Airbus A320", tinh_trang_hoat_dong=True, so_luong_hang_ghe_1=30,
+            #                    so_luong_hang_ghe_2=100, nam_san_xuat=datetime(2018, 7, 15))
+            # may_bay_3 = MayBay(ten_may_bay="Boeing 777", tinh_trang_hoat_dong=True, so_luong_hang_ghe_1=40,
+            #                    so_luong_hang_ghe_2=200, nam_san_xuat=datetime(2020, 1, 12))
+            # db.session.add_all([may_bay_1, may_bay_2, may_bay_3])
+            #
+            # # Tạo dữ liệu mẫu cho bảng GheMayBay
+            # ghe_may_bay_1 = GheMayBay(may_bay_id=1, ten_ghe="1A", hang_ghe="Thương gia", trang_thai_ghe=False)
+            # ghe_may_bay_2 = GheMayBay(may_bay_id=1, ten_ghe="2A", hang_ghe="Thương gia", trang_thai_ghe=False)
+            # ghe_may_bay_3 = GheMayBay(may_bay_id=1, ten_ghe="3A", hang_ghe="Thương gia", trang_thai_ghe=False)
+            # db.session.add_all([ghe_may_bay_1, ghe_may_bay_2, ghe_may_bay_3])
 
-        # Thêm dữ liệu mẫu cho LichChuyenBay (Lịch chuyến bay)
-        lcb1 = LichChuyenBay(chuyen_bay_id=1, may_bay_id=1, ngay_gio=datetime(2024, 5, 20, 8, 0),
-                             thoi_gian_bay=2.5, so_luong_hang_ve_1=150, so_luong_hang_ve_2=100, price=1500)
-        db.session.add(lcb1)
-        db.session.commit()
+            # # Tạo dữ liệu mẫu cho bảng ChuyenBay
+            chuyen_bay_1 = ChuyenBay(ten_chuyen_bay="AV123", tuyen_bay_id=1, may_bay_id=1,
+                                     ngay_gio_bay=datetime(2025, 5, 15, 10, 0), gia_ve_hang_1=2000000.0,
+                                     gia_ve_hang_2=1000000.0)
+            # chuyen_bay_2 = ChuyenBay(ten_chuyen_bay="VN456", tuyen_bay_id=2, may_bay_id=2,
+            #                          ngay_gio_bay=datetime(2023, 5, 21, 12, 0), gia_ve_hang_1=3000000.0,
+            #                          gia_ve_hang_2=1500000.0)
+            # chuyen_bay_3 = ChuyenBay(ten_chuyen_bay="VN789", tuyen_bay_id=3, may_bay_id=3,
+            #                          ngay_gio_bay=datetime(2023, 5, 22, 14, 0), gia_ve_hang_1=4000000.0,
+            #                          gia_ve_hang_2=2000000.0)
+            # db.session.add_all([chuyen_bay_1, chuyen_bay_2, chuyen_bay_3])
 
-        lcb1 = LichChuyenBay(chuyen_bay_id=1, may_bay_id=1, ngay_gio=datetime(2024, 12, 20, 15, 0),
-                             thoi_gian_bay=2.5, so_luong_hang_ve_1=1, so_luong_hang_ve_2=0, price=1000)
-        db.session.add(lcb1)
-        db.session.commit()
+            # # Tạo dữ liệu mẫu cho bảng KhachHang
+            # khach_hang_1 = KhachHang(ten_khach_hang="Tran Van C", sdt="0123456789",
+            #                          CCCD="123456789012")
+            # khach_hang_2 = KhachHang(ten_khach_hang="Tran Van ADDAS", sdt="0123456789",
+            #                      CCCD="210987456321")
+            # khach_hang_3 = KhachHang(ten_khach_hang="Lê Van A", sdt="0123456789",
+            #                      CCCD="125478785412")
+            # db.session.add_all([khach_hang_1, khach_hang_2, khach_hang_3])
+            #
+            # ve_1 = Ve(khach_hang_id=5, chuyen_bay_id=2, user_id=4, ghe_id=1, hoa_don_id=1)
+            # ve_2 = Ve(khach_hang_id=6, chuyen_bay_id=2, user_id=5, ghe_id=2, hoa_don_id=2)
+            # ve_3 = Ve(khach_hang_id=7, chuyen_bay_id=3, user_id=6, ghe_id=3, hoa_don_id=3)
+            # db.session.add_all([ve_1, ve_2, ve_3])
 
-        # Thêm dữ liệu mẫu cho Customer (Khách hàng)
-        customer1 = Customer(name="KieuMy", sex='Nu', phone="0123456789",
-                             address="30/04 Giai Phong, HCM", email="abc@gmail.com", CCCD="11223344")
-        db.session.add(customer1)
-        db.session.commit()
-
-
-        # Thêm dữ liệu mẫu cho User (Người dùng)
-        password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
-        userADMIN = User(name="Admin",
-                     username="admin",
-                     password=password,
-                     avatar="https://res.cloudinary.com/dtkzgdef1/image/upload/v1734452164/admin_cphvla.png",
-                     user_role=UserRole.ADMIN)
-
-        userNV = User(name="Nhân Viên",
-                     username="NV",
-                     password=password,
-                     avatar="https://res.cloudinary.com/dtkzgdef1/image/upload/v1734451928/staff_mtx1bk.png",
-                     user_role=UserRole.STAFF)
-        db.session.commit()
-        db.session.add_all([userADMIN, userNV])
-        db.session.commit()
-
-
-        # Tạo một vé và gán id_user cho vé
-        ticket1 = Ticket(id_user=1, so_ghe="A1", hang_ve='HangVe1', customer=1)
-        db.session.add(ticket1)
-        db.session.commit()
-
-
-        # Thêm dữ liệu mẫu cho TicketDetail (Chi tiết vé)
-        ticket_detail1 = TicketDetail(lich_chuyen_bay=lcb1, id_ve=1, price=200)
-        db.session.add(ticket_detail1)
-        db.session.commit()
-
-
-        # Lưu dữ liệu vào cơ sở dữ liệu
-        db.session.commit()
-
-
-
+            # Tạo dữ liệu mẫu cho bảng HoaDon
+            # hoa_don_1 = HoaDon( ngay_thanh_toan=datetime(2023, 5, 1), tong_tien=2000000.0,
+            #                    phuong_thuc_thanh_toan="Tiền mặt")
+            # hoa_don_2 = HoaDon( ngay_thanh_toan=datetime(2023, 5, 1), tong_tien=1000000.0,
+            #                    phuong_thuc_thanh_toan="Thẻ tín dụng")
+            # hoa_don_3 = HoaDon( ngay_thanh_toan=datetime(2023, 6, 10), tong_tien=2500000.0,
+            #                    phuong_thuc_thanh_toan="Chuyển khoản")
+            # db.session.add_all([hoa_don_1, hoa_don_2, hoa_don_3])
+            db.session.commit()
 

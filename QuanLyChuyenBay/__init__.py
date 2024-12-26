@@ -30,12 +30,21 @@ san_bay_trung_gian_toi_da = 5
 thoi_gian_dung_toi_da = 2
 thoi_gian_dung_toi_thieu = 0.1
 
-# Các thông số cần thiết từ tài khoản VNPay Sandbox
-vnpay_config = {
+VN_PAY_CONFIG = {
     'vnp_TmnCode': 'PMAKVMOW',
     'vnp_HashSecret': 'USYEHCIUSVVCFQYKBQBZSUASXUXRSTCS',
     'vnp_Url': 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
 }
+
+MOMO_CONFIG = {
+    'partner_code': 'MOMO',
+    'access_key': 'YOUR_ACCESS_KEY',
+    'secret_key': 'YOUR_SECRET_KEY',
+    'endpoint': 'https://test-payment.momo.vn/gw_payment/transactionProcessor',
+    'return_url': 'http://127.0.0.1:5000/momo_return',
+    'notify_url': 'http://127.0.0.1:5000/momo_notify'
+}
+
 
 # babel = Babel(app=app)
 # @babel.localeselector

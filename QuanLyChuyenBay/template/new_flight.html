@@ -1,0 +1,85 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Tạo Chuyến Bay{% endblock %}
+
+{% block content %}
+<h1 class="text-center text-primary mt-2">TẠO CHUYẾN BAY MỚI</h1>
+
+<form method="post" action="{{ url_for('tao_chuyen_bay') }}">
+    <div class="form-group">
+        <label for="ten_chuyen_bay">Tên Chuyến Bay:</label>
+        <input type="text" class="form-control" id="ten_chuyen_bay" name="ten_chuyen_bay" required>
+    </div>
+    <div class="form-group">
+        <label for="tuyen_bay_id">Tuyến Bay:</label>
+        <select class="form-control" id="tuyen_bay_id" name="tuyen_bay_id" required>
+            {% for tuyen in tuyen_bays %}
+                <option value="{{ tuyen.id }}">{{ tuyen.san_bay_di.ten_sb }} - {{ tuyen.san_bay_den.ten_sb }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="may_bay_id">Máy Bay:</label>
+        <select class="form-control" id="may_bay_id" name="may_bay_id" required>
+            {% for may_bay in may_bays %}
+                <option value="{{ may_bay.id }}">{{ may_bay.ten_may_bay }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="ngay_gio_bay">Ngày – Giờ:</label>
+        <input type="datetime-local" class="form-control" id="ngay_gio_bay" name="ngay_gio_bay" required>
+    </div>
+    <div class="form-group">
+        <label for="thoi_gian_bay">Thời Gian Bay (phút):</label>
+        <input type="number" class="form-control" id="thoi_gian_bay" name="thoi_gian_bay" required>
+    </div>
+    <div class="form-group">
+        <label for="so_luong_ghe_hang_1">Số Lượng Ghế Hạng 1:</label>
+        <input type="number" class="form-control" id="so_luong_ghe_hang_1" name="so_luong_ghe_hang_1" readonly>
+    </div>
+    <div class="form-group">
+        <label for="so_luong_ghe_hang_2">Số Lượng Ghế Hạng 2:</label>
+        <input type="number" class="form-control" id="so_luong_ghe_hang_2" name="so_luong_ghe_hang_2" readonly>
+    </div>
+    <div class="form-group">
+        <label for="so_san_bay_tg">Số lượng sân bay trung gian:</label>
+        <input type="number" class="form-control" id="so_san_bay_tg" name="so_san_bay_tg" min="0" max="2" required>
+    </div>
+    <div id="san_bay_trung_gian_container">
+        <!-- Sân bay trung gian sẽ được thêm vào đây -->
+    </div>
+    <div>
+        <input type="submit" value="Lưu Chuyến Bay" class="btn btn-primary"/>
+    </div>
+</form>
+
+<script>
+document.getElementById('so_san_bay_tg').addEventListener('change', function() {
+    var container = document.getElementById('san_bay_trung_gian_container');
+    container.innerHTML = ''; // Xóa nội dung cũ
+
+    var soSanBayTG = this.value;
+
+    for (var i = 0; i < soSanBayTG; i++) {
+        container.innerHTML += `
+            <div class="form-group">
+                <label for="san_bay_trung_gian${i + 1}">Sân Bay Trung Gian ${i + 1}:</label>
+                <select class="form-control" id="san_bay_trung_gian${i + 1}" name="san_bay_trung_gian${i + 1}" required>
+                    {% for san_bay in san_bays %}
+                        <option value="{{ san_bay.id }}">{{ san_bay.ten_sb }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="thoi_gian_dung${i + 1}">Thời Gian Dừng (phút) ${i + 1}:</label>
+                <input type="number" class="form-control" id="thoi_gian_dung${i + 1}" name="thoi_gian_dung${i + 1}" required>
+            </div>
+            <div class="form-group">
+                <label for="ghi_chu${i + 1}">Ghi Chú ${i + 1}:</label>
+                <textarea class="form-control" id="ghi_chu${i + 1}" name="ghi_chu${i + 1}"></textarea>
+            </div>`;
+    }
+});
+</script>
+{% endblock %}

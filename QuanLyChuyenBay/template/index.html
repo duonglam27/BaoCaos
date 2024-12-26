@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- Banner Carousel -->
 <div id="carouselExampleAutoplaying" class="carousel slide carousel-fade" data-bs-ride="carousel">
     <div class="carousel-inner">
         <div class="carousel-item active">
@@ -34,45 +33,37 @@
     </button>
 </div>
 
-<!-- Flight search form -->
+
 <div class="container mb-5">
-    <h2 class="text-center mb-4">Tra cứu chuyến bay</h2>
-    <form class="row g-4 justify-content-center" method="GET" action="/order">
+        <h2 class="text-center mb-4">Tra cứu chuyến bay</h2>
+        <form class="d-flex justify-content-center" method="POST" action="{{ url_for('tra_cuu_chuyen_bay') }}">
+            <!-- Dropdown for From (Từ) -->
+            <div class="input-group me-2">
+                <select class="form-control" name="from" style="width: 250px;">
+                    <option value="">Địa điểm đi</option>
+                    {% for dia_diem in ten_dia_diem %}
+                    <option value="{{ dia_diem.ten_sb }}">{{ dia_diem.ten_sb }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <!-- Dropdown for From (Từ) -->
-        <div class="col-md-3">
-            <label for="from" class="form-label">Nơi đi</label>
-            <select class="form-control" id="from" name="from">
-                <option value="">Chọn nơi đi</option>
-                {% for san_bay in san_bay %}
-                <option value="{{ san_bay.dia_diem }}">{{ san_bay.dia_diem }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <!-- Dropdown for To (Đến) -->
+            <div class="input-group me-2">
+                <select class="form-control" name="to" style="width: 250px;">
+                    <option value="">Địa điểm đến</option>
+                    {% for dia_diem in ten_dia_diem %}
+                    <option value="{{ dia_diem.ten_sb }}">{{ dia_diem.ten_sb }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <!-- Dropdown for To (Đến) -->
-        <div class="col-md-3">
-            <label for="to" class="form-label">Nơi đến</label>
-            <select class="form-control" id="to" name="to">
-                <option value="">Chọn nơi đến</option>
-                {% for san_bay in san_bay %}
-                <option value="{{ san_bay.dia_diem }}">{{ san_bay.dia_diem }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <!-- Date input -->
+            <div class="input-group me-2">
+                <input class="form-control" type="date" placeholder="Ngày bay" name="date" style="width: 250px;">
+            </div>
 
-        <!-- Date input -->
-        <div class="col-md-3">
-            <label for="date" class="form-label">Ngày bay</label>
-            <input class="form-control" type="date" id="date" name="date" placeholder="Ngày bay">
-        </div>
-
-        <!-- Submit Button -->
-        <div class="col-md-3 d-flex justify-content-center align-items-end">
-            <button class="btn btn-primary w-100" type="submit">Tìm ngay</button>
-        </div>
-
-    </form>
-</div>
+            <button class="btn btn-primary" type="submit">Tìm</button>
+        </form>
+    </div>
 
 {% endblock %}

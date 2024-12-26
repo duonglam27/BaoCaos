@@ -1,0 +1,29 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+    <div class="container mb-5">
+        <h2 class="text-center">Thanh Toán</h2>
+        <div class="card">
+            <div class="card-header">
+                <h3>Chuyến bay: {{ chuyen_bay.ten_chuyen_bay }}</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>ID Chuyến bay:</strong> {{ chuyen_bay.id }}</p>
+                <p><strong>Ngày giờ bay:</strong> {{ chuyen_bay.ngay_gio_bay }}</p>
+                <p><strong>Hạng vé:</strong> {{ hang }}</p>
+                <p><strong>Giá vé:</strong> {{ gia_ve }} VND</p>
+            </div>
+            <div class="card-footer text-center">
+                <a href="{{ url_for('detail_flight', flight_id=chuyen_bay.id) }}" class="btn btn-primary">Quay lại</a>
+                <form method="POST" action="{{ url_for('momo_payment', flight_id=chuyen_bay.id, ticket_class=ticket_class) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Thanh Toán bằng MoMo</button>
+                </form>
+                <form method="POST" action="{{ url_for('vnpay_payment', flight_id=chuyen_bay.id, ticket_class=ticket_class) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-info">Thanh Toán bằng VNPay</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
