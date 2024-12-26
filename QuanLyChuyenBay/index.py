@@ -1,8 +1,8 @@
-
+from _pydatetime import timedelta
 from datetime import datetime
 import time
 from QuanLyChuyenBay import app, dao, admin, login, utils
-from flask import render_template, request, redirect, session, jsonify, url_for
+from flask import render_template, request, redirect, session, jsonify, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
 import cloudinary.uploader
 from QuanLyChuyenBay import app, dao, db, gio_mua_toi_da, gio_ban_toi_da, thoi_gian_bay_toi_thieu, \
@@ -12,7 +12,7 @@ from QuanLyChuyenBay.dao import load_san_bay, get_chuyen_bay_by_id, get_availabl
 from QuanLyChuyenBay.models import ChuyenBay, SanBayTrungGian, TuyenBay, KhachHang, GioiTinhEnum, SanBay, GheMayBay, Ve, \
     MayBay
 from flask import render_template
-
+from __init__ import QuyDinh
 
 
 @app.route('/')
@@ -384,67 +384,100 @@ def tao_tuyen_bay():
 
 
 @app.route('/tao_chuyen_bay', methods=['GET', 'POST'])
-def tao_chuyen_bay():
-    tuyen_bays = TuyenBay.query.all()
-    may_bays = MayBay.query.all()
-    san_bays = SanBay.query.all()
+@app.route('/ban_ve', methods=['GET', 'POST'])
+def ban_ve():
+    chuyen_bays = ChuyenBay.query.all()  # Lấy tất cả các chuyến bay
 
     if request.method == 'POST':
-        ten_chuyen_bay = request.form['ten_chuyen_bay']
-        tuyen_bay_id = request.form['tuyen_bay_id']
-        may_bay_id = request.form['may_bay_id']
-        ngay_gio_bay = datetime.strptime(request.form['ngay_gio_bay'], '%Y-%m-%dT%H:%M')
-        thoi_gian_bay = int(request.form['thoi_gian_bay'])
-        so_san_bay_tg = int(request.form['so_san_bay_tg'])
+        chuyen_bay_id = request.form['chuyen_bay_id']
+        ten_hanh_khach = request.form['ten_hanh_khach']
+        cmnd = request.form['cmnd']
+        dien_thoai = request.form['dien_thoai']
+        hang_ve = int(request.form['hang_ve'])
 
-        if thoi_gian_bay < 30:
-            return "Thời gian bay tối thiểu là 30 phút", 400
+        chuyen_bay = ChuyenBay.query.get(chuyen_bay_id)
+        now = datetime.now()
 
-        may_bay = MayBay.query.get(may_bay_id)
-        so_ghe_hang_1 = may_bay.so_luong_hang_ghe_1
-        so_ghe_hang_2 = may_bay.so_luong_hang_ghe_2
-        san_bay_trung_gian = []
-        thoi_gian_dung = []
-        ghi_chu = []
+        # Kiểm tra xem chuyến bay có còn vé không và còn 4 giờ trước khi bay không
+        if chuyen_bay.ngay_gio_bay - now < timedelta(hours=4):
+            return "Không thể bán vé cho chuyến bay quá gần giờ khởi hành", 400
 
-        for i in range(so_san_bay_tg):
-            san_bay_trung_gian.append(request.form[f'san_bay_trung_gian{i + 1}'])
-            thoi_gian_dung.append(request.form[f'thoi_gian_dung{i + 1}'])
-            ghi_chu.append(request.form[f'ghi_chu{i + 1}'])
+        if hang_ve == 1:
+            # Kiểm tra số lượng ghế hạng 1 còn lại
+            if chuyen_bay.gia_ve_hang_1 <= 0:
+                return "Không còn vé hạng 1", 400
+        else:
+            # Kiểm tra số lượng ghế hạng 2 còn lại
+            if chuyen_bay.gia_ve_hang_2 <= 0:
+                return "Không còn vé hạng 2", 400
 
-        if len(san_bay_trung_gian) > 2:
-            return "Chỉ được tối đa 2 sân bay trung gian", 400
-
-        for tg in thoi_gian_dung:
-            if not 20 <= int(tg) <= 30:
-                return "Thời gian dừng phải từ 20-30 phút", 400
-
-        chuyen_bay_moi = ChuyenBay(ten_chuyen_bay=ten_chuyen_bay,
-                                   tuyen_bay_id=tuyen_bay_id,
-                                   may_bay_id=may_bay_id,
-                                   ngay_gio_bay=ngay_gio_bay,
-                                   gia_ve_hang_1=so_ghe_hang_1,
-                                   gia_ve_hang_2=so_ghe_hang_2)
-
-        db.session.add(chuyen_bay_moi)
+        # Tạo hành khách mới và vé mới
+        hanh_khach = KhachHang(ten_hanh_khach=ten_hanh_khach, cmnd=cmnd, dien_thoai=dien_thoai)
+        db.session.add(hanh_khach)
         db.session.commit()
 
-        for i, san_bay in enumerate(san_bay_trung_gian):
-            if san_bay:
-                san_bay_trung_gian_moi = SanBayTrungGian(
-                    tuyen_bay_id=tuyen_bay_id,
-                    san_bay_id=san_bay,
-                    thu_tu_dung=i+1,
-                    thoi_gian_dung=int(thoi_gian_dung[i]),
-                    ghi_chu=ghi_chu[i]
-                )
-                db.session.add(san_bay_trung_gian_moi)
+        ve = Ve(chuyen_bay_id=chuyen_bay_id, hang_ve=hang_ve, hanh_khach_id=hanh_khach.id)
+        db.session.add(ve)
+        db.session.commit()
+
+        # Cập nhật lại số lượng ghế hạng 1 và hạng 2
+        if hang_ve == 1:
+            chuyen_bay.gia_ve_hang_1 -= 1
+        else:
+            chuyen_bay.gia_ve_hang_2 -= 1
 
         db.session.commit()
 
         return redirect(url_for('home'))
 
-    return render_template('new_flight.html', tuyen_bays=tuyen_bays, may_bays=may_bays, san_bays=san_bays)
+    return render_template('ban_ve.html', chuyen_bays=chuyen_bays)
+
+
+
+@app.route('/lap-lich', methods=['GET', 'POST'])
+def lap_lich():
+    quy_dinh = QuyDinh()  # Khởi tạo đối tượng QuyDinh
+
+    if request.method == 'POST':
+        ma_chuyen_bay = request.form['ma_chuyen_bay']
+        san_bay_di = request.form['san_bay_di']
+        san_bay_den = request.form['san_bay_den']
+        ngay_gio_bay = datetime.strptime(request.form['ngay_gio_bay'], '%Y-%m-%d %H:%M')
+        thoi_gian_bay = int(request.form['thoi_gian_bay'])
+
+        # Kiểm tra thời gian bay tối thiểu
+        if thoi_gian_bay < quy_dinh.thoi_gian_bay_toi_thieu:
+            flash(f"Thời gian bay phải tối thiểu {quy_dinh.thoi_gian_bay_toi_thieu} phút!")
+            return redirect(url_for('lap_lich'))
+
+        # Kiểm tra số lượng sân bay trung gian
+        san_bay_trung_gian = request.form.getlist('san_bay_trung_gian')  # Lấy danh sách sân bay trung gian
+        thoi_gian_dung = request.form.getlist('thoi_gian_dung')          # Lấy danh sách thời gian dừng
+        if len(san_bay_trung_gian) > quy_dinh.so_san_bay_trung_gian_toi_da:
+            flash(f"Chỉ được phép tối đa {quy_dinh.so_san_bay_trung_gian_toi_da} sân bay trung gian!")
+            return redirect(url_for('lap_lich'))
+
+        # Kiểm tra thời gian dừng
+        for tg_dung in thoi_gian_dung:
+            tg_dung = int(tg_dung)
+            if tg_dung < quy_dinh.thoi_gian_dung_min or tg_dung > quy_dinh.thoi_gian_dung_max:
+                flash(f"Thời gian dừng tại sân bay trung gian phải từ {quy_dinh.thoi_gian_dung_min}-{quy_dinh.thoi_gian_dung_max} phút!")
+                return redirect(url_for('lap_lich'))
+
+        # Thêm lịch chuyến bay nếu thỏa mãn quy định
+        chuyen_bay = ChuyenBay(
+            ma_chuyen_bay=ma_chuyen_bay,
+            san_bay_di=san_bay_di,
+            san_bay_den=san_bay_den,
+            ngay_gio_bay=ngay_gio_bay,
+            thoi_gian_bay=thoi_gian_bay
+        )
+        db.session.add(chuyen_bay)
+        db.session.commit()
+        flash("Lịch chuyến bay đã được tạo thành công!")
+        return redirect(url_for('lap_lich'))
+
+    return render_template('lap_lich.html')
 
 
 if __name__ == '__main__':

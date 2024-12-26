@@ -1,25 +1,47 @@
-<form method="POST">
-    <label for="chuyen_bay_id">Chuyến bay:</label>
-    <select name="chuyen_bay_id">
-        {% for chuyen_bay in chuyen_bays %}
-            <option value="{{ chuyen_bay.id }}">{{ chuyen_bay.ten_chuyen_bay }}</option>
-        {% endfor %}
-    </select>
+{% extends 'layout/base.html' %}
 
-    <label for="hang_ve">Hạng vé:</label>
-    <select name="hang_ve">
-        <option value="hang_1">Hạng 1</option>
-        <option value="hang_2">Hạng 2</option>
-    </select>
+{% block title %}Bán Vé Chuyến Bay{% endblock %}
 
-    <label for="ten_khach_hang">Tên khách hàng:</label>
-    <input type="text" name="ten_khach_hang">
+{% block content %}
+<h1 class="text-center text-primary mt-2">BÁN VÉ CHUYẾN BAY</h1>
 
-    <label for="cccd">CMND/CCCD:</label>
-    <input type="text" name="cccd">
-
-    <label for="dien_thoai">Điện thoại:</label>
-    <input type="text" name="dien_thoai">
-
-    <button type="submit">Bán vé</button>
+<form method="post" action="{{ url_for('ban_ve') }}">
+    <div class="form-group">
+        <label for="chuyen_bay_id">Chuyến Bay:</label>
+        <select class="form-control" id="chuyen_bay_id" name="chuyen_bay_id" required>
+            {% for chuyen_bay in chuyen_bays %}
+                <option value="{{ chuyen_bay.id }}">
+                    {{ chuyen_bay.ten_chuyen_bay }} - {{ chuyen_bay.ngay_gio_bay }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="ten_hanh_khach">Tên Hành Khách:</label>
+        <input type="text" class="form-control" id="ten_hanh_khach" name="ten_hanh_khach" required>
+    </div>
+    <div class="form-group">
+        <label for="cmnd">CMND/CCCD:</label>
+        <input type="text" class="form-control" id="cmnd" name="cmnd" required>
+    </div>
+    <div class="form-group">
+        <label for="dien_thoai">Điện Thoại:</label>
+        <input type="text" class="form-control" id="dien_thoai" name="dien_thoai" required>
+    </div>
+    <div class="form-group">
+        <label for="hang_ve">Hạng Vé:</label>
+        <select class="form-control" id="hang_ve" name="hang_ve" required>
+            <option value="1">Hạng 1</option>
+            <option value="2">Hạng 2</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="gia_ve">Giá Vé:</label>
+        <input type="number" class="form-control" id="gia_ve" name="gia_ve" readonly>
+    </div>
+    <div>
+        <input type="submit" value="Bán Vé" class="btn btn-primary"/>
+    </div>
 </form>
+
+{% endblock %}

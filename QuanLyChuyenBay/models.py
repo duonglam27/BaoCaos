@@ -11,10 +11,7 @@ from enum import Enum as HangVeEnum
 from enum import Enum as Sex
 from QuanLyChuyenBay import db, app
 
-
 from enum import Enum
-
-
 
 class GioiTinhEnum(Enum):
     NAM = 'Nam'
@@ -185,6 +182,8 @@ if __name__ == '__main__':
         # db.drop_all()
 
             db.create_all()
+
+
 
             # Tạo dữ liệu mẫu cho bảng Role
             # role1 = Role(ten_role="Admin")

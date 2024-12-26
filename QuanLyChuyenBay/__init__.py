@@ -74,3 +74,15 @@ class QuyDinh(db.Model):
                                  nullable=False)  # Thời gian đặt vé trước chuyến bay (ví dụ: 30 phút trước chuyến bay)
     don_gia_ve = db.Column(db.Float, nullable=False)  # Đơn giá vé mặc định
 
+
+
+class QuyDinh:
+    def __init__(self):
+        self.gio_ban_toi_da = 4  # Giờ trước chuyến bay, không bán vé nếu ít hơn 4 giờ
+        self.thoi_gian_bay_toi_thieu = 30  # Phút, thời gian bay tối thiểu
+        self.so_san_bay_trung_gian_toi_da = 2  # Số sân bay trung gian tối đa
+        self.thoi_gian_dung_min = 20  # Phút, thời gian dừng tối thiểu tại sân bay trung gian
+        self.thoi_gian_dung_max = 30  # Phút, thời gian dừng tối đa tại sân bay trung gian
+        self.so_ghe_hang_1 = 100  # Số lượng ghế hạng 1
+        self.so_ghe_hang_2 = 150  # Số lượng ghế hạng 2
+
