@@ -11,7 +11,7 @@ from sqlalchemy.orm.strategy_options import joinedload
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.sqltypes import NULLTYPE
 
-from QuanLyChuyenBay.models import MayBay, ChuyenBay, TuyenBay, SanBay, User, Ve, Role, KhachHang, SanBayTrungGian,GheMayBay
+from QuanLyChuyenBay.models import MayBay, ChuyenBay, TuyenBay, SanBay, User, Ve, Role, KhachHang, SanBayTrungGian,GheMayBay,HoaDon
 from QuanLyChuyenBay import db
 import datetime
 from flask_login import current_user
@@ -89,15 +89,17 @@ def get_user_by_id(user_id):
 def get_customer_by_phone(sdt):
     return KhachHang.query.filter_by(sdt=sdt).first()
 
-def register(name, username, password, avatar):
+def register(name, username, password, anh_dai_dien):
     try:
         password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())  # Mã hóa mật khẩu với MD5
-        u = User(user_role_id=3, name=name, username=username.strip(), password=password, anh_dai_dien=avatar)
+        u = User(user_role_id=2, name=name, username=username.strip(), password=password, anh_dai_dien=anh_dai_dien)
         db.session.add(u)
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
         raise ValueError("Tên đăng nhập đã tồn tại")
+
+
 
 
 
@@ -244,22 +246,23 @@ def sell_ticket(khach_hang_id, chuyen_bay_id, hang_ghe, gia_ve, user_id):
 
 
 
-def get_doanh_thu_theo_thang(thang):
-    query = """
-    SELECT tuyen_bay.id, 
-           CONCAT(san_bay_di.ten_sb, ' - ', san_bay_den.ten_sb) AS ten_tuyen_bay,
-           SUM(CASE WHEN ghe_may_bay.hang_ghe = 'hang_1' THEN chuyen_bay.gia_ve_hang_1 ELSE 0 END) AS doanh_thu_hang_1, 
-           SUM(CASE WHEN ghe_may_bay.hang_ghe = 'hang_2' THEN chuyen_bay.gia_ve_hang_2 ELSE 0 END) AS doanh_thu_hang_2,
-           COUNT(ve.id) AS so_luot_bay
-    FROM ve
-    JOIN ghe_may_bay ON ve.ghe_id = ghe_may_bay.id
-    JOIN chuyen_bay ON ve.chuyen_bay_id = chuyen_bay.id
-    JOIN tuyen_bay ON chuyen_bay.tuyen_bay_id = tuyen_bay.id
-    JOIN san_bay AS san_bay_di ON tuyen_bay.san_bay_di_id = san_bay_di.id
-    JOIN san_bay AS san_bay_den ON tuyen_bay.san_bay_den_id = san_bay_den.id
-    JOIN hoa_don ON ve.hoa_don_id = hoa_don.id
-    WHERE EXTRACT(MONTH FROM hoa_don.ngay_thanh_toan) = :thang
-    GROUP BY tuyen_bay.id, san_bay_di.ten_sb, san_bay_den.ten_sb
-    """
-    return db.session.execute(query, {'thang': thang}).fetchall()
 
+
+
+def get_doanh_thu_theo_thang(thang):
+    results = db.session.query(
+        TuyenBay.id,
+        TuyenBay.san_bay_di_id,
+        TuyenBay.san_bay_den_id,
+        func.count(ChuyenBay.id).label('so_luot_bay'),
+        func.sum(HoaDon.tong_tien).label('doanh_thu')
+    ).join(ChuyenBay, TuyenBay.id == ChuyenBay.tuyen_bay_id)\
+     .join(Ve, ChuyenBay.id == Ve.chuyen_bay_id)\
+     .join(HoaDon, Ve.hoa_don_id == HoaDon.id)\
+     .filter(func.month(ChuyenBay.ngay_gio_bay) == thang)\
+     .group_by(TuyenBay.id)\
+     .all()
+
+    return results
+
+    return results

@@ -19,8 +19,4 @@ def set_tg_bay_toi_thieu(tgbay):
         return tgbay
 
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, IntegerField, SubmitField
-from wtforms.validators import DataRequired, Length
-
 

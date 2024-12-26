@@ -192,23 +192,28 @@ if __name__ == '__main__':
             # db.session.add_all([role1, role2, role3])
 
             # Tạo dữ liệu mẫu cho bảng User
-            # user1 = User(name="Nguyen Van A", username="nguyenvana", password="password", user_role_id=1)
-            # user2 = User(name="Le Thi B", username="lethib", password="password", user_role_id=2)
-            # user3 = User(name="Tran Van C", username="tranvanc", password="password", user_role_id=3)
-            # db.session.add_all([user1, user2, user3])
+            password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
+            user1 = User(name="admin", username="20", password=password, user_role_id=1)
+            user2 = User(name="Staff", username="4", password=password, user_role_id=2)
+            user3 = User(name="NGdung", username="5", password=password, user_role_id=3)
 
+            db.session.add_all([user1, user2, user3])
+
+
+        # db.session.add_all([user1, user2, user3])
+            #
             # # Tạo dữ liệu mẫu cho bảng SanBay
             # san_bay_1 = SanBay(ten_sb="Tan Son Nhat", ten_khu_vuc="Ho Chi Minh")
             # san_bay_2 = SanBay(ten_sb="Noi Bai", ten_khu_vuc="Ha Noi")
             # san_bay_3 = SanBay(ten_sb="Da Nang", ten_khu_vuc="Da Nang")
             # db.session.add_all([san_bay_1, san_bay_2, san_bay_3])
-            #
+
             # # Tạo dữ liệu mẫu cho bảng TuyenBay
             # tuyen_bay_1 = TuyenBay(san_bay_di_id=1, san_bay_den_id=2, khoang_cach=1150.0, thoi_gian_bay=120)
             # tuyen_bay_2 = TuyenBay(san_bay_di_id=2, san_bay_den_id=3, khoang_cach=800.0, thoi_gian_bay=90)
             # tuyen_bay_3 = TuyenBay(san_bay_di_id=3, san_bay_den_id=1, khoang_cach=850.0, thoi_gian_bay=100)
             # db.session.add_all([tuyen_bay_1, tuyen_bay_2, tuyen_bay_3])
-            #
+
             # # Tạo dữ liệu mẫu cho bảng SanBayTrungGian
             # san_bay_trung_gian_1 = SanBayTrungGian(tuyen_bay_id=1, san_bay_id=1, thu_tu_dung=1, thoi_gian_dung=30,
             #                                        ghi_chu="Dung de tiep nhien lieu")
@@ -217,7 +222,7 @@ if __name__ == '__main__':
             # san_bay_trung_gian_3 = SanBayTrungGian(tuyen_bay_id=3, san_bay_id=3, thu_tu_dung=1, thoi_gian_dung=35,
             #                                        ghi_chu="Dung de tiep nhien lieu")
             # db.session.add_all([san_bay_trung_gian_1, san_bay_trung_gian_2, san_bay_trung_gian_3])
-
+            #
             # # Tạo dữ liệu mẫu cho bảng MayBay
             # may_bay_1 = MayBay(ten_may_bay="Boeing 737", tinh_trang_hoat_dong=True, so_luong_hang_ghe_1=20,
             #                    so_luong_hang_ghe_2=80, nam_san_xuat=datetime(2015, 5, 21))
@@ -233,19 +238,19 @@ if __name__ == '__main__':
             # ghe_may_bay_3 = GheMayBay(may_bay_id=1, ten_ghe="3A", hang_ghe="Thương gia", trang_thai_ghe=False)
             # db.session.add_all([ghe_may_bay_1, ghe_may_bay_2, ghe_may_bay_3])
 
-            # # Tạo dữ liệu mẫu cho bảng ChuyenBay
-            chuyen_bay_1 = ChuyenBay(ten_chuyen_bay="AV123", tuyen_bay_id=1, may_bay_id=1,
-                                     ngay_gio_bay=datetime(2025, 5, 15, 10, 0), gia_ve_hang_1=2000000.0,
-                                     gia_ve_hang_2=1000000.0)
+            # # # Tạo dữ liệu mẫu cho bảng ChuyenBay
+            # chuyen_bay_1 = ChuyenBay(ten_chuyen_bay="AV123", tuyen_bay_id=1, may_bay_id=1,
+            #                          ngay_gio_bay=datetime(2024, 5, 15, 10, 0), gia_ve_hang_1=2000000.0,
+            #                          gia_ve_hang_2=1000000.0)
             # chuyen_bay_2 = ChuyenBay(ten_chuyen_bay="VN456", tuyen_bay_id=2, may_bay_id=2,
-            #                          ngay_gio_bay=datetime(2023, 5, 21, 12, 0), gia_ve_hang_1=3000000.0,
+            #                          ngay_gio_bay=datetime(2024, 5, 21, 12, 0), gia_ve_hang_1=3000000.0,
             #                          gia_ve_hang_2=1500000.0)
             # chuyen_bay_3 = ChuyenBay(ten_chuyen_bay="VN789", tuyen_bay_id=3, may_bay_id=3,
-            #                          ngay_gio_bay=datetime(2023, 5, 22, 14, 0), gia_ve_hang_1=4000000.0,
+            #                          ngay_gio_bay=datetime(2024, 6, 22, 14, 0), gia_ve_hang_1=4000000.0,
             #                          gia_ve_hang_2=2000000.0)
             # db.session.add_all([chuyen_bay_1, chuyen_bay_2, chuyen_bay_3])
 
-            # # Tạo dữ liệu mẫu cho bảng KhachHang
+            # Tạo dữ liệu mẫu cho bảng KhachHang
             # khach_hang_1 = KhachHang(ten_khach_hang="Tran Van C", sdt="0123456789",
             #                          CCCD="123456789012")
             # khach_hang_2 = KhachHang(ten_khach_hang="Tran Van ADDAS", sdt="0123456789",
@@ -253,18 +258,18 @@ if __name__ == '__main__':
             # khach_hang_3 = KhachHang(ten_khach_hang="Lê Van A", sdt="0123456789",
             #                      CCCD="125478785412")
             # db.session.add_all([khach_hang_1, khach_hang_2, khach_hang_3])
-            #
-            # ve_1 = Ve(khach_hang_id=5, chuyen_bay_id=2, user_id=4, ghe_id=1, hoa_don_id=1)
-            # ve_2 = Ve(khach_hang_id=6, chuyen_bay_id=2, user_id=5, ghe_id=2, hoa_don_id=2)
-            # ve_3 = Ve(khach_hang_id=7, chuyen_bay_id=3, user_id=6, ghe_id=3, hoa_don_id=3)
+
+            # ve_1 = Ve(khach_hang_id=4, chuyen_bay_id=1, user_id=1, ghe_id=1, hoa_don_id=1)
+            # ve_2 = Ve(khach_hang_id=5, chuyen_bay_id=2, user_id=2, ghe_id=2, hoa_don_id=2)
+            # ve_3 = Ve(khach_hang_id=6, chuyen_bay_id=3, user_id=3, ghe_id=3, hoa_don_id=3)
             # db.session.add_all([ve_1, ve_2, ve_3])
 
             # Tạo dữ liệu mẫu cho bảng HoaDon
-            # hoa_don_1 = HoaDon( ngay_thanh_toan=datetime(2023, 5, 1), tong_tien=2000000.0,
+            # hoa_don_1 = HoaDon( ngay_thanh_toan=datetime(2024, 5, 1), tong_tien=2000000.0,
             #                    phuong_thuc_thanh_toan="Tiền mặt")
-            # hoa_don_2 = HoaDon( ngay_thanh_toan=datetime(2023, 5, 1), tong_tien=1000000.0,
+            # hoa_don_2 = HoaDon( ngay_thanh_toan=datetime(2024, 5, 1), tong_tien=1000000.0,
             #                    phuong_thuc_thanh_toan="Thẻ tín dụng")
-            # hoa_don_3 = HoaDon( ngay_thanh_toan=datetime(2023, 6, 10), tong_tien=2500000.0,
+            # hoa_don_3 = HoaDon( ngay_thanh_toan=datetime(2024, 6, 10), tong_tien=2500000.0,
             #                    phuong_thuc_thanh_toan="Chuyển khoản")
             # db.session.add_all([hoa_don_1, hoa_don_2, hoa_don_3])
             db.session.commit()

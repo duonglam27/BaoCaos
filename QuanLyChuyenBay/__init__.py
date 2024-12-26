@@ -10,7 +10,7 @@ from oauthlib.common import CLIENT_ID_CHARACTER_SET
 
 
 app = Flask(__name__, template_folder='template')
-app.secret_key = "!@#$%^&*dasdafas()"
+app.secret_key = "!@#$%^&*dasdafaádasds()"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/maybaydb?charset=utf8mb4' % quote('lam27072004Aa')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['CART_KEY'] = 'cart'
