@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Đặt vé cho chuyến bay: {{ chuyen_bay.ten_chuyen_bay }}</h1>
-<form method="POST" action="{{ url_for('order', chuyen_bay_id=chuyen_bay.id) }}">
+<form method="POST" action="{{ url_for('thanhtoan', chuyen_bay_id=chuyen_bay.id) }}">
     <p>Hành khách: <input type="text" name="ten_hanh_khach" required></p>
     <p>CMND/CCCD: <input type="text" name="cccd" required></p>
     <p>Điện thoại: <input type="text" name="sdt" required></p>
@@ -15,7 +15,7 @@
         {% endfor %}
     </select>
     <p>Giá tiền: <span id="gia_tien">{{ hang_ghe_chuyen_bay[0].gia }}</span> VNĐ</p>  <!-- Hiển thị giá khởi đầu -->
-    <button type="submit" >Đặt vé</button>
+    <button type="submit">Đặt vé</button>
 </form>
 <a href="{{ url_for('chuyenbaylistactive') }}">Quay lại danh sách</a>
 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Chuyến Bay</title>
+</head>
+<body>
+    <h1>Tạo Chuyến Bay Mới</h1>
+    <form method="POST">
+        <label for="ma_chuyen_bay">Mã chuyến bay:</label>
+        <input type="text" id="ma_chuyen_bay" name="ma_chuyen_bay" required><br>
+
+        <label for="san_bay_di">Sân bay đi:</label>
+        <select id="san_bay_di" name="san_bay_di">
+            {% for san_bay in san_bays %}
+                <option value="{{ san_bay.id }}">{{ san_bay.ten }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="san_bay_den">Sân bay đến:</label>
+        <select id="san_bay_den" name="san_bay_den">
+            {% for san_bay in san_bays %}
+                <option value="{{ san_bay.id }}">{{ san_bay.ten }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="ngay_gio_bay">Ngày – giờ:</label>
+        <input type="datetime-local" id="ngay_gio_bay" name="ngay_gio_bay" required><br>
+
+        <label for="thoi_gian_bay">Thời gian bay (phút):</label>
+        <input type="number" id="thoi_gian_bay" name="thoi_gian_bay" required><br>
+
+        <label for="so_luong_ghe_hang_1">Số lượng ghế hạng 1:</label>
+        <input type="number" id="so_luong_ghe_hang_1" name="so_luong_ghe_hang_1" required><br>
+
+        <label for="so_luong_ghe_hang_2">Số lượng ghế hạng 2:</label>
+        <input type="number" id="so_luong_ghe_hang_2" name="so_luong_ghe_hang_2" required><br>
+
+        <h3>Sân bay trung gian</h3>
+        <div id="san_bay_trung_gian_container">
+            <div>
+                <label for="san_bay_trung_gian">Sân bay trung gian:</label>
+                <select name="san_bay_trung_gian">
+                    {% for san_bay in san_bays %}
+                        <option value="{{ san_bay.id }}">{{ san_bay.ten }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="thoi_gian_dung">Thời gian dừng (phút):</label>
+                <input type="number" name="thoi_gian_dung">
+
+                <label for="ghi_chu">Ghi chú:</label>
+                <input type="text" name="ghi_chu">
+            </div>
+        </div>
+        <button type="button" onclick="addStop()">Thêm sân bay trung gian</button><br><br>
+
+        <button type="submit">Tạo chuyến bay</button>
+    </form>
+
+    <script>
+        function addStop() {
+            const container = document.getElementById('san_bay_trung_gian_container');
+            const newStop = container.children[0].cloneNode(true);
+            container.appendChild(newStop);
+        }
+    </script>
+</body>
+</html>
