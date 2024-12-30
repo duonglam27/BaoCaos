@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thay Đổi Quy Định Hệ Thống</title>
+</head>
+<body>
+    <h1>Thay Đổi Quy Định Hệ Thống</h1>
+    <form method="POST" action="{{ url_for('thay_doi_quy_dinh') }}">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.so_luong_san_bay.label }}<br>
+            {{ form.so_luong_san_bay(size=10) }}
+        </div>
+        <div>
+            {{ form.thoi_gian_bay_toi_thieu.label }}<br>
+            {{ form.thoi_gian_bay_toi_thieu(size=10) }}
+        </div>
+        <div>
+            {{ form.so_san_bay_trung_gian_toi_da.label }}<br>
+            {{ form.so_san_bay_trung_gian_toi_da(size=10) }}
+        </div>
+        <div>
+            {{ form.thoi_gian_dung_toi_thieu.label }}<br>
+            {{ form.thoi_gian_dung_toi_thieu(size=10) }}
+        </div>
+        <div>
+            {{ form.thoi_gian_dung_toi_da.label }}<br>
+            {{ form.thoi_gian_dung_toi_da(size=10) }}
+        </div>
+        <div>
+            {{ form.thoi_gian_ban_ve.label }}<br>
+            {{ form.thoi_gian_ban_ve(size=10) }}
+        </div>
+        <div>
+            {{ form.thoi_gian_dat_ve.label }}<br>
+            {{ form.thoi_gian_dat_ve(size=10) }}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+</body>
+</html>

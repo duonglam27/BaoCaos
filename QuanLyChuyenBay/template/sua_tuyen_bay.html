@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa Tuyến Bay</title>
+</head>
+<body>
+    <h1>Sửa Tuyến Bay</h1>
+    <form method="POST" action="{{ url_for('sua_tuyen_bay', tuyen_bay_id=tuyen_bay.id) }}">
+        <label for="ten_tuyen_bay">Tên Tuyến Bay:</label>
+        <input type="text" id="ten_tuyen_bay" name="ten_tuyen_bay" value="{{ tuyen_bay.ten_tuyen_bay }}" required>
+        <button type="submit">Cập Nhật</button>
+    </form>
+    <a href="{{ url_for('danh_sach_tuyen_bay') }}">Quay lại danh sách</a>
+</body>
+</html>

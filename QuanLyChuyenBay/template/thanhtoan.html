@@ -1,38 +1,33 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<h1>Đặt vé cho chuyến bay: {{ chuyen_bay.ten_chuyen_bay }}</h1>
-<form method="POST" action="{{ url_for('thanhtoan', chuyen_bay_id=chuyen_bay.id) }}">
-    <p>Hành khách: <input type="text" name="ten_hanh_khach" required></p>
-    <p>CMND/CCCD: <input type="text" name="cccd" required></p>
-    <p>Điện thoại: <input type="text" name="sdt" required></p>
-    <p>Hạng ghế:</p>
-    <select name="hang_ve" id="hang_ve" required>
-        {% for hg in hang_ghe_chuyen_bay %}
-        <option value="{{ hg.id }}" data-gia="{{ hg.gia }}">
-            {{ hg.hang_ghe.ten_hang_ghe }} - Giá: {{ hg.gia }} - Còn: {{ hg.so_luong_ghe }}
-        </option>
-        {% endfor %}
-    </select>
-    <p>Giá tiền: <span id="gia_tien">{{ hang_ghe_chuyen_bay[0].gia }}</span> VNĐ</p>  <!-- Hiển thị giá khởi đầu -->
-    <button type="submit">Đặt vé</button>
+<h1>Thanh Toán Chuyến Bay</h1>
+<p><strong>Tên Chuyến Bay:</strong> {{ chuyen_bay.ten_chuyen_bay }}</p>
+<p><strong>Mã Chuyến Bay:</strong> {{ chuyen_bay.id }}</p>
+<p><strong>Ngày Bay:</strong> {{ chuyen_bay.ngay_bay }}</p>
+
+<form method="POST">
+    <div class="form-group">
+        <label for="ten_hanh_khach">Tên Hành Khách:</label>
+        <input type="text" name="ten_hanh_khach" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="cccd">CCCD:</label>
+        <input type="text" name="cccd" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="sdt">Số Điện Thoại:</label>
+        <input type="text" name="sdt" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="hang_ghe_chuyen_bay_id">Hạng Ghế:</label>
+        <select name="hang_ghe_chuyen_bay_id" class="form-control" required>
+            {% for hang_ghe_chuyen_bay in hang_ghe_chuyen_bays %}
+            <option value="{{ hang_ghe_chuyen_bay.id }}">{{ hang_ghe_chuyen_bay.hang_ghe.ten_hang_ghe }} - {{ hang_ghe_chuyen_bay.hang_ghe.gia }} VND (Còn {{ hang_ghe_chuyen_bay.so_luong_ghe }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Thanh Toán</button>
 </form>
-<a href="{{ url_for('chuyenbaylistactive') }}">Quay lại danh sách</a>
-
-<!-- JavaScript để cập nhật giá tiền khi thay đổi hạng ghế -->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var hangVeSelect = document.getElementById("hang_ve");
-        var giaTienSpan = document.getElementById("gia_tien");
-
-        hangVeSelect.addEventListener("change", function() {
-            var selectedOption = hangVeSelect.options[hangVeSelect.selectedIndex];
-            var giaTien = selectedOption.getAttribute("data-gia");
-            giaTienSpan.textContent = giaTien;
-        });
-
-        // Gọi sự kiện để cập nhật ngay khi trang tải
-        hangVeSelect.dispatchEvent(new Event('change'));
-    });
-</script>
+<a href="{{ url_for('timchuyenbay') }}" class="btn btn-secondary">Quay lại</a>
 {% endblock %}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Chuyến Bay</title>
+</head>
+<body>
+    <h1>Sửa Chuyến Bay</h1>
+    <form method="POST">
+        <div>
+            <label for="ma_chuyen_bay">Mã chuyến bay:</label>
+            <input type="text" name="ma_chuyen_bay" required>
+        </div>
+        <div>
+            <label for="san_bay_di">Sân bay đi:</label>
+            <select name="san_bay_di" required>
+                {% for san_bay in san_bays %}
+                <option value="{{ san_bay.id }}">{{ san_bay.ten_sb }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="san_bay_den">Sân bay đến:</label>
+            <select name="san_bay_den" required>
+                {% for san_bay in san_bays %}
+                <option value="{{ san_bay.id }}">{{ san_bay.ten_sb }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="ngay_gio">Ngày – giờ:</label>
+            <input type="datetime-local" name="ngay_gio" required>
+        </div>
+        <div>
+            <label for="thoi_gian_bay">Thời gian bay (phút):</label>
+            <input type="number" name="thoi_gian_bay" required>
+        </div>
+        <h2>Hạng Ghế</h2>
+        <div>
+            <label for="hang_ghe_1">Hạng ghế 1:</label>
+            <select name="hang_ghe_1" required>
+                {% for hang_ghe in hang_ghes %}
+                <option value="{{ hang_ghe.id }}">{{ hang_ghe.ten_hang_ghe }}</option>
+                {% endfor %}
+            </select>
+            <label for="so_luong_ghe_1">Số lượng ghế hạng 1 (để trống nếu không giới hạn):</label>
+            <input type="number" name="so_luong_ghe_1">
+        </div>
+        <div>
+            <label for="hang_ghe_2">Hạng ghế 2:</label>
+            <select name="hang_ghe_2" required>
+                {% for hang_ghe in hang_ghes %}
+                <option value="{{ hang_ghe.id }}">{{ hang_ghe.ten_hang_ghe }}</option>
+                {% endfor %}
+            </select>
+            <label for="so_luong_ghe_2">Số lượng ghế hạng 2 (để trống nếu không giới hạn):</label>
+            <input type="number" name="so_luong_ghe_2">
+        </div>
+        <h2>Sân Bay Trung Gian</h2>
+        <div>
+            <label for="san_bay_trung_gian_1">STT 1:</label>
+            <select name="san_bay_trung_gian_1">
+                {% for san_bay in san_bays %}
+                <option value="{{ san_bay.id }}">{{ san_bay.ten_sb }}</option>
+                {% endfor %}
+            </select>
+            <label for="thoi_gian_dung_1">Thời gian dừng (phút):</label>
+            <input type="number" name="thoi_gian_dung_1">
+            <label for="ghi_chu_1">Ghi chú:</label>
+            <input type="text" name="ghi_chu_1">
+        </div>
+        <div>
+            <label for="san_bay_trung_gian_2">STT 2:</label>
+            <select name="san_bay_trung_gian_2">
+                {% for san_bay in san_bays %}
+                <option value="{{ san_bay.id }}">{{ san_bay.ten_sb }}</option>
+                {% endfor %}
+            </select>
+            <label for="thoi_gian_dung_2">Thời gian dừng (phút):</label>
+            <input type="number" name="thoi_gian_dung_2">
+            <label for="ghi_chu_2">Ghi chú:</label>
+            <input type="text" name="ghi_chu_2">
+        </div>
+        <button type="submit">Sửa Chuyến Bay</button>
+    </form>
+    <a href="{{ url_for('home') }}">Quay lại</a>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<h1>Kết Quả Tìm Kiếm Chuyến Bay</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tên Chuyến Bay</th>
+            <th>Mã Chuyến Bay</th>
+            <th>Ngày Bay</th>
+            <th>Trạng Thái</th>
+            <th>Thao Tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for chuyen_bay in chuyen_bays %}
+        <tr>
+            <td>{{ chuyen_bay.ten_chuyen_bay }}</td>
+            <td>{{ chuyen_bay.id }}</td>
+            <td>{{ chuyen_bay.ngay_bay }}</td>
+            <td>
+                {% if chuyen_bay.tinh_trang %}
+                    Đang hoạt động
+                {% else %}
+                    Đã hủy
+                {% endif %}
+            </td>
+            <td>
+                <!-- Nút Thanh Toán -->
+                <a href="{{ url_for('thanhtoan', chuyen_bay_id=chuyen_bay.id) }}" class="btn btn-success">Thanh Toán</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('timchuyenbay') }}" class="btn btn-primary">Tìm Chuyến Bay Khác</a>
+{% endblock %}

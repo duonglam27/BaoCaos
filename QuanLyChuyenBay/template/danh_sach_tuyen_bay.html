@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Tuyến Bay</title>
+</head>
+<body>
+    <h1>Danh Sách Tuyến Bay</h1>
+    <a href="{{ url_for('them_tuyen_bay') }}">Thêm Tuyến Bay</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên Tuyến Bay</th>
+                <th>Hành Động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tuyen_bay in tuyen_bays %}
+            <tr>
+                <td>{{ tuyen_bay.id }}</td>
+                <td>{{ tuyen_bay.ten_tuyen_bay }}</td>
+                <td>
+                    <a href="{{ url_for('sua_tuyen_bay', tuyen_bay_id=tuyen_bay.id) }}">Sửa</a> |
+                    <a href="{{ url_for('xoa_tuyen_bay', tuyen_bay_id=tuyen_bay.id) }}"
+                       onclick="return confirm('Bạn có chắc muốn xóa tuyến bay này?');">Xóa</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

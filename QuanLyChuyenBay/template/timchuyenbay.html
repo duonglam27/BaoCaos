@@ -1,0 +1,17 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<h1>Tìm Chuyến Bay</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="ten_chuyen_bay">Tên Chuyến Bay:</label>
+        <input type="text" name="ten_chuyen_bay" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="ngay_bay">Ngày Bay (YYYY-MM-DD):</label>
+        <input type="text" name="ngay_bay" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Tìm Chuyến Bay</button>
+</form>
+<a href="{{ url_for('home') }}" class="btn btn-secondary">Quay lại</a>
+{% endblock %}

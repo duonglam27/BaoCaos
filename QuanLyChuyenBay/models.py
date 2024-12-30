@@ -1,4 +1,5 @@
 import hashlib
+from email.policy import default
 
 from click import DateTime
 from flask import Flask
@@ -11,6 +12,7 @@ from sqlalchemy.orm import relationship, backref
 
 from QuanLyChuyenBay import app, db
 
+
 class QuyDinhHeThong(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     soLuongSanBay = db.Column(db.Integer, nullable=False, default=10)  # Thêm cột và default value
@@ -21,10 +23,12 @@ class QuyDinhHeThong(db.Model):
     thoiGianDatVe = db.Column(db.Integer, nullable=False, default=12)
     thoiGianBanVe = db.Column(db.Integer, nullable=False, default=4)
 
+
 class Role(Enum):
     ADMIN = 'admin'
     NV = 'nhan vien'
     USER = 'user'
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -67,9 +71,10 @@ class User(db.Model):
 class HangGhe(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ten_hang_ghe = db.Column(db.String(100), nullable=False)
-    gia=db.Column(db.Integer,nullable=False)
+    gia = db.Column(db.Integer, nullable=False)
 
     hang_ghes = relationship('HangGheChuyenBay', backref='hang_ghe', lazy=True)
+
 
 class SanBay(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -77,46 +82,53 @@ class SanBay(db.Model):
 
     san_bays = relationship('SanBayTrungGian', backref='chuyen_bay', lazy=True)
 
+
 class TuyenBay(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ten_tuyen_bay = db.Column(db.String(50), nullable=False)
 
-    tuyen_bays=relationship('ChuyenBay',backref='tuyen_bay',lazy=True)
+    tuyen_bays = relationship('ChuyenBay', backref='tuyen_bay', lazy=True)
 
 
 class ChuyenBay(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ten_chuyen_bay = db.Column(db.String(100), nullable=False)
     tuyen_bay_id = db.Column(db.Integer, db.ForeignKey(TuyenBay.id), nullable=False)
-    ngay_bay=db.Column(db.DateTime,nullable=False)
-    tinh_trang = db.Column(db.Boolean, nullable=False)
+    ten_chuyen_bay = db.Column(db.String(100), nullable=False)
+    san_bay_di_id = db.Column(db.Integer, db.ForeignKey(SanBay.id), nullable=False)
+    san_bay_den_id = db.Column(db.Integer, db.ForeignKey(SanBay.id), nullable=False)
+    thoi_gian_bay=db.Column(db.Integer, nullable=False)
+    ngay_bay = db.Column(db.DateTime, nullable=False)
+    tinh_trang = db.Column(db.Boolean, nullable=False,default=True)
 
     chuyen_bay_dat_ves = relationship('DatVe', backref='chuyen_bay_dat_ve', lazy=True)
     chuyen_bay_hang_ghe_chuyen_bays = relationship('HangGheChuyenBay', backref='chuyen_bay_hang_ghe', lazy=True)
-    chuyen_bay_san_bay_trung_gians = relationship('SanBayTrungGian', backref='chuyen_bay_san_bay_trung_gian', lazy=True)  # Sửa backref ở đây
+    chuyen_bay_san_bay_trung_gians = relationship('SanBayTrungGian', backref='chuyen_bay_san_bay_trung_gian',
+                                                  lazy=True)  # Sửa backref ở đây
+
 
 class SanBayTrungGian(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    tuyen_bay_id = db.Column(db.Integer, db.ForeignKey(ChuyenBay.id), nullable=False)
+    chuyen_bay_id = db.Column(db.Integer, db.ForeignKey(ChuyenBay.id), nullable=False)
     san_bay_id = db.Column(db.Integer, db.ForeignKey(SanBay.id), nullable=False)
-    thoi_gian_dung=db.Column(db.Integer,nullable=False)
-    ghi_chu= db.Column(db.String(100),nullable=True)
+    thoi_gian_dung = db.Column(db.Integer, nullable=False)
+    ghi_chu = db.Column(db.String(100), nullable=True)
 
 
 class HangGheChuyenBay(db.Model):
-    id=db.Column(db.Integer,primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     hang_ghe_id = db.Column(db.Integer, db.ForeignKey(HangGhe.id), nullable=False)
     chuyen_bay_id = db.Column(db.Integer, db.ForeignKey(ChuyenBay.id), nullable=False)
-    so_luong_ghe=db.Column(db.Integer,nullable=False)
+    so_luong_ghe = db.Column(db.Integer, nullable=False)
+
+    hang_ghe_dat_ve = relationship('DatVe', backref='hang_ghe_dat_ve', lazy=True)
 
 
-    hang_ghe_dat_ve=relationship('DatVe',backref='hang_ghe_dat_ve',lazy=True)
 
 class DatVe(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     chuyen_bay_id = db.Column(db.Integer, db.ForeignKey(ChuyenBay.id), nullable=False)
-    user_id=db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    ten_hanh_khach=db.Column(db.String(100),nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
+    ten_hanh_khach = db.Column(db.String(100), nullable=False)
     cccd = db.Column(db.String(100), nullable=False)
     sdt = db.Column(db.String(100), nullable=False)
     hang_ghe_chuyen_bay_id = db.Column(db.Integer, db.ForeignKey(HangGheChuyenBay.id),
@@ -124,25 +136,17 @@ class DatVe(db.Model):
 
     hoa_dons = relationship('HoaDon', backref='hoa_don', lazy=True)
 
+
 class HoaDon(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     dat_ve_id = db.Column(db.Integer, db.ForeignKey(DatVe.id), nullable=False)
-    tong_tien=db.Column(db.Float,nullable=False)
-    ngay_thanh_toan=db.Column(db.DateTime,nullable=False)
+    tong_tien = db.Column(db.Float, nullable=False)
+    ngay_thanh_toan = db.Column(db.DateTime, nullable=False)
     trang_thai_hoa_don = db.Column(db.Boolean, nullable=False)
-
-
-
-
 
 
 def hash_password(password):
     return hashlib.md5(password.encode()).hexdigest()
-
-
-
-
-
 
 
 with app.app_context():
@@ -163,11 +167,16 @@ with app.app_context():
     db.session.commit()
     # Tạo dữ liệu mẫu cho bảng User
     users = [
-        User(name="User 1", username="user1", password=hash_password("password1"), user_role=Role.ADMIN, anh_dai_dien="default.jpg"),
-        User(name="User 2", username="user2", password=hash_password("password2"), user_role=Role.NV, anh_dai_dien="default.jpg"),
-        User(name="User 3", username="user3", password=hash_password("password3"), user_role=Role.USER, anh_dai_dien="default.jpg"),
-        User(name="User 4", username="user4", password=hash_password("password4"), user_role=Role.USER, anh_dai_dien="default.jpg"),
-        User(name="User 5", username="user5", password=hash_password("password5"), user_role=Role.USER, anh_dai_dien="default.jpg")
+        User(name="User 1", username="user1", password=hash_password("password1"), user_role=Role.ADMIN,
+             anh_dai_dien="default.jpg"),
+        User(name="User 2", username="user2", password=hash_password("password2"), user_role=Role.NV,
+             anh_dai_dien="default.jpg"),
+        User(name="User 3", username="user3", password=hash_password("password3"), user_role=Role.USER,
+             anh_dai_dien="default.jpg"),
+        User(name="User 4", username="user4", password=hash_password("password4"), user_role=Role.USER,
+             anh_dai_dien="default.jpg"),
+        User(name="User 5", username="user5", password=hash_password("password5"), user_role=Role.USER,
+             anh_dai_dien="default.jpg")
     ]
     db.session.add_all(users)
     db.session.commit()
@@ -207,11 +216,16 @@ with app.app_context():
 
     # Tạo dữ liệu mẫu cho bảng ChuyenBay
     chuyen_bays = [
-        ChuyenBay(ten_chuyen_bay="VN001", tuyen_bay_id=1, ngay_bay=datetime(2024, 12, 31, 8, 0), tinh_trang=True),
-        ChuyenBay(ten_chuyen_bay="VN002", tuyen_bay_id=2, ngay_bay=datetime(2024, 12, 31, 12, 0), tinh_trang=True),
-        ChuyenBay(ten_chuyen_bay="VN003", tuyen_bay_id=3, ngay_bay=datetime(2024, 12, 31, 16, 0), tinh_trang=True),
-        ChuyenBay(ten_chuyen_bay="VN004", tuyen_bay_id=4, ngay_bay=datetime(2024, 12, 31, 20, 0), tinh_trang=True),
-        ChuyenBay(ten_chuyen_bay="VN005", tuyen_bay_id=5, ngay_bay=datetime(2025, 1, 1, 0, 0), tinh_trang=True)
+        ChuyenBay(tuyen_bay_id=1, ten_chuyen_bay="VN001", san_bay_di_id=1, san_bay_den_id=2,
+                  ngay_bay=datetime(2024, 12, 31, 8, 0), tinh_trang=True,thoi_gian_bay=100),
+        ChuyenBay(tuyen_bay_id=2, ten_chuyen_bay="VN002", san_bay_di_id=3, san_bay_den_id=1,
+                  ngay_bay=datetime(2024, 12, 31, 12, 0), tinh_trang=True,thoi_gian_bay=100),
+        ChuyenBay(tuyen_bay_id=3, ten_chuyen_bay="VN003", san_bay_di_id=1, san_bay_den_id=5,
+                  ngay_bay=datetime(2024, 12, 31, 16, 0), tinh_trang=True,thoi_gian_bay=50),
+        ChuyenBay(tuyen_bay_id=4, ten_chuyen_bay="VN004", san_bay_di_id=2, san_bay_den_id=5,
+                  ngay_bay=datetime(2024, 12, 31, 20, 0), tinh_trang=True,thoi_gian_bay=100),
+        ChuyenBay(tuyen_bay_id=5, ten_chuyen_bay="VN005", san_bay_di_id=1, san_bay_den_id=3,
+                  ngay_bay=datetime(2025, 1, 1, 0, 0), tinh_trang=True,thoi_gian_bay=60)
     ]
     db.session.add_all(chuyen_bays)
     db.session.commit()
@@ -229,11 +243,16 @@ with app.app_context():
 
     # Tạo dữ liệu mẫu cho bảng DatVe
     dat_ves = [
-        DatVe(chuyen_bay_id=1, user_id=1, ten_hanh_khach="Hanh Khach 1", cccd="123456789", sdt="0987654321", hang_ghe_chuyen_bay_id=1),
-        DatVe(chuyen_bay_id=1, user_id=2, ten_hanh_khach="Hanh Khach 2", cccd="987654321", sdt="0123456789", hang_ghe_chuyen_bay_id=2),
-        DatVe(chuyen_bay_id=2, user_id=3, ten_hanh_khach="Hanh Khach 3", cccd="223344556", sdt="0912345678", hang_ghe_chuyen_bay_id=3),
-        DatVe(chuyen_bay_id=3, user_id=4, ten_hanh_khach="Hanh Khach 4", cccd="445566778", sdt="0901234567", hang_ghe_chuyen_bay_id=4),
-        DatVe(chuyen_bay_id=4, user_id=5, ten_hanh_khach="Hanh Khach 5", cccd="556677889", sdt="0998765432", hang_ghe_chuyen_bay_id=5)
+        DatVe(chuyen_bay_id=1, user_id=1, ten_hanh_khach="Hanh Khach 1", cccd="123456789", sdt="0987654321",
+              hang_ghe_chuyen_bay_id=1),
+        DatVe(chuyen_bay_id=1, user_id=2, ten_hanh_khach="Hanh Khach 2", cccd="987654321", sdt="0123456789",
+              hang_ghe_chuyen_bay_id=2),
+        DatVe(chuyen_bay_id=2, user_id=3, ten_hanh_khach="Hanh Khach 3", cccd="223344556", sdt="0912345678",
+              hang_ghe_chuyen_bay_id=3),
+        DatVe(chuyen_bay_id=3, user_id=4, ten_hanh_khach="Hanh Khach 4", cccd="445566778", sdt="0901234567",
+              hang_ghe_chuyen_bay_id=4),
+        DatVe(chuyen_bay_id=4, user_id=5, ten_hanh_khach="Hanh Khach 5", cccd="556677889", sdt="0998765432",
+              hang_ghe_chuyen_bay_id=5)
     ]
     db.session.add_all(dat_ves)
     db.session.commit()

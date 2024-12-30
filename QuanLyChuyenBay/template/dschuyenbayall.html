@@ -1,0 +1,49 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<h1>Kết Quả Tìm Kiếm Chuyến Bay</h1>
+{% if current_user.is_admin() %}
+<!-- Nút thêm chuyến bay mới -->
+<a href="{{ url_for('themchuyenbay') }}" class="btn btn-primary mb-3">Thêm Chuyến Bay</a>
+{% endif %}
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Tên Chuyến Bay</th>
+        <th>Mã Chuyến Bay</th>
+        <th>Ngày Bay</th>
+        <th>Trạng Thái</th>
+        <th>Thao Tác</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for chuyen_bay in chuyen_bays %}
+    <tr>
+        <td>{{ chuyen_bay.ten_chuyen_bay }}</td>
+        <td>{{ chuyen_bay.id }}</td>
+        <td>{{ chuyen_bay.ngay_bay }}</td>
+        <td>
+            {% if chuyen_bay.tinh_trang %}
+            Đang hoạt động
+            {% else %}
+            Đã hủy
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ url_for('thanhtoan', chuyen_bay_id=chuyen_bay.id) }}" class="btn btn-success">Thanh Toán</a>
+            <!-- Nút Sửa -->
+            {% if current_user.is_admin() %}
+            <a href="{{ url_for('sua_chuyen_bay', chuyen_bay_id=chuyen_bay.id) }}" class="btn btn-warning">Sửa</a>
+
+            <!-- Nút Xóa -->
+            <a href="{{ url_for('xoa_chuyen_bay', chuyen_bay_id=chuyen_bay.id) }}" class="btn btn-danger"
+               onclick="return confirm('Bạn có chắc chắn muốn xóa chuyến bay này?')">Xóa</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('timchuyenbay') }}" class="btn btn-primary">Tìm Chuyến Bay Khác</a>
+{% endblock %}

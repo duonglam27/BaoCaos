@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Doanh Thu</title>
+    <!-- Đảm bảo đã thêm Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Báo Cáo Doanh Thu Theo Tháng</h1>
+
+    <!-- Hiển thị bảng báo cáo doanh thu -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tuyến bay</th>
+                <th>Doanh thu</th>
+                <th>Số lượt bay</th>
+                <th>Tỷ lệ (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in bao_cao %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.tuyen_bay }}</td>
+                    <td>{{ row.doanh_thu }}</td>
+                    <td>{{ row.so_luot_bay }}</td>
+                    <td>{{ (row.doanh_thu / tong_doanh_thu) * 100 }}%</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Tổng doanh thu -->
+    <h3>Tổng doanh thu: {{ tong_doanh_thu }}</h3>
+
+    <!-- Biểu đồ doanh thu -->
+    <canvas id="myChart" width="400" height="200"></canvas>
+
+    <script>
+        // Kiểm tra dữ liệu trong console
+        console.log({
+            labels: [{% for row in bao_cao %}'{{ row.tuyen_bay }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            data: [{% for row in bao_cao %}{{ row.doanh_thu }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        });
+
+        // Vẽ biểu đồ doanh thu
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',  // Biểu đồ cột (bar chart)
+            data: {
+                labels: [{% for row in bao_cao %}'{{ row.tuyen_bay }}'{% if not loop.last %}, {% endif %}{% endfor %}],  // Tên các tuyến bay
+                datasets: [{
+                    label: 'Doanh Thu',
+                    data: [{% for row in bao_cao %}{{ row.doanh_thu }}{% if not loop.last %}, {% endif %}{% endfor %}],  // Doanh thu của các tuyến bay
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
