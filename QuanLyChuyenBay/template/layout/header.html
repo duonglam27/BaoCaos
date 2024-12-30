@@ -101,16 +101,23 @@
                         </a>
                     </h5>
                 </li>
-                {% endif %}
-
-                {% if current_user.is_user() %}
                 <li class="nav-item">
                     <h5>
-                        <a class="nav-link">Vé <span class="badge bg-danger cart-counter"
-                                style="font-size: 9px;"></span></a>
+                        <a class="nav-link" href="/dschuyenbayall">
+                            Quản Lý chuyến bay
+                        </a>
+                    </h5>
+                </li>
+                 <li class="nav-item">
+                    <h5>
+                        <a class="nav-link" href="/danh_sach_tuyen_bay">
+                            Quản Lý tuyến bay
+                        </a>
                     </h5>
                 </li>
                 {% endif %}
+
+
                 {% endif %}
             </ul>
         </div>

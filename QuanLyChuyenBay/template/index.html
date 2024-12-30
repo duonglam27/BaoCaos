@@ -33,21 +33,6 @@
     </button>
 </div>
 
-<h1>Search Flights</h1>
-<form action="{{ url_for('home') }}" method="get">
-    <div class="input-group me-2">
-        <select class="form-control" name="san_bay" style="width: 250px;">
-            <option value="">Select Airport</option>
-            {% for sanbay in sanbays %}
-            <option value="{{ sanbay.id }}" {% if san_bay == sanbay.id %}selected{% endif %}>{{ sanbay.ten_sb }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="input-group">
-        <label for="ngay_bay">Ngày Bay:</label>
-        <input type="date" id="ngay_bay" name="ngay_bay" value="{{ ngay_bay }}">
-    </div>
-    <button type="submit" name="action" value="tim" class="btn btn-primary mt-2">Tìm</button>
-</form>
+<h1 class="">Chào Mừng Đến Với Hệ Thống Quản Lý Chuyến Bay</h1>
 
 {% endblock %}
