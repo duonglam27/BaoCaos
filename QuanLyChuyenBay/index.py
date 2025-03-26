@@ -355,7 +355,7 @@ def bao_cao_doanh_thu_theo_thang(thang, nam):
     # Render template báo cáo doanh thu
     return render_template('baocaodoanhthu.html', bao_cao=bao_cao, tong_doanh_thu=tong_doanh_thu, thang=thang, nam=nam)
 
-
+@app.route('/register', methods=['GET', 'POST'])
 def user_register():
     err_msg = ''
     if request.method == 'POST':
